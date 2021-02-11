@@ -1,28 +1,17 @@
+version: "3"
 services:
+  rucioclient:
+    image: docker.io/rucio/rucio-dev:py3
+    command: ["sleep", "10000"]
+    volumes:
+      - ../../../tools:/opt/rucio/tools:Z
+      - ../../../bin:/opt/rucio/bin:Z
+      - ../../../lib:/opt/rucio/lib:Z
+    environment:
+      - X509_USER_CERT=/opt/rucio/etc/usercert.pem
+      - X509_USER_KEY=/opt/rucio/etc/userkey.pem
   rucio:
     image: docker.io/rucio/rucio-dev:py3
-    extra_hosts:
-      - "ruciodb:127.0.0.1"
-      - "graphite:127.0.0.1"
-      - "fts:127.0.0.1"
-      - "ftsdb:127.0.0.1"
-      - "xrd1:127.0.0.1"
-      - "xrd2:127.0.0.1"
-      - "xrd3:127.0.0.1"
-      - "xrd4:127.0.0.1"
-      - "minio:127.0.0.1"
-    ports:
-      - "8443:443"
-      - "5432:5432"
-      - "8080:80"
-      - "8446:8446"
-      - "8449:8449"
-      - "3306:3306"
-      - "1094:1094"
-      - "1095:1095"
-      - "1096:1096"
-      - "1097:1097"
-      - "9000:9000"
     volumes:
       - ../../../tools:/opt/rucio/tools:Z
       - ../../../bin:/opt/rucio/bin:Z
@@ -33,7 +22,6 @@ services:
       - RDBMS=postgres11
   ruciodb:
     image: docker.io/postgres:11
-    network_mode: "service:rucio"
     environment:
       - POSTGRES_USER=rucio
       - POSTGRES_DB=rucio
@@ -41,13 +29,10 @@ services:
     command: ["-c", "fsync=off","-c", "synchronous_commit=off","-c", "full_page_writes=off"]
   graphite:
     image: docker.io/graphiteapp/graphite-statsd
-    network_mode: "service:rucio"
   fts:
     image: docker.io/rucio/fts
-    network_mode: "service:rucio"
   ftsdb:
     image: docker.io/mysql:5
-    network_mode: "service:rucio"
     environment:
       - MYSQL_USER=fts
       - MYSQL_PASSWORD=fts
@@ -55,7 +40,6 @@ services:
       - MYSQL_DATABASE=fts
   xrd1:
     image: docker.io/rucio/xrootd
-    network_mode: "service:rucio"
     environment:
       - XRDPORT=1094
     volumes:
@@ -63,7 +47,6 @@ services:
       - ../../certs/hostcert_xrd1.key.pem:/tmp/xrdkey.pem:Z
   xrd2:
     image: docker.io/rucio/xrootd
-    network_mode: "service:rucio"
     environment:
       - XRDPORT=1095
     volumes:
@@ -71,7 +54,6 @@ services:
       - ../../certs/hostcert_xrd2.key.pem:/tmp/xrdkey.pem:Z
   xrd3:
     image: docker.io/rucio/xrootd
-    network_mode: "service:rucio"
     environment:
       - XRDPORT=1096
     volumes:
@@ -79,7 +61,6 @@ services:
       - ../../certs/hostcert_xrd3.key.pem:/tmp/xrdkey.pem:Z
   xrd4:
     image: docker.io/rucio/xrootd
-    network_mode: "service:rucio"
     environment:
       - XRDPORT=1097
     volumes:
@@ -87,7 +68,6 @@ services:
       - ../../certs/hostcert_xrd4.key.pem:/tmp/xrdkey.pem:Z
   minio:
     image: docker.io/minio/minio
-    network_mode: "service:rucio"
     environment:
       - MINIO_ACCESS_KEY=admin
       - MINIO_SECRET_KEY=password

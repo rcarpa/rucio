@@ -8,6 +8,9 @@
  Authors:
  - Vincent Garonne, <vincent.garonne@cern.ch>, 2012
 '''
+import os
+os.system('xrdgsiproxy -cert /opt/rucio/etc/usercert.pem -key /opt/rucio/etc/userkey.pem init >/dev/null 2>&1')
+
 
 try:
     from rucio.vcsversion import VERSION_INFO
