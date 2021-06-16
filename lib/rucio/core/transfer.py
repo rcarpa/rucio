@@ -940,6 +940,9 @@ def get_hops(source_rse_id, dest_rse_id, include_multihop=False, multihop_rses=N
     :returns:                   List of hops in the format [{'source_rse_id': source_rse_id, 'source_scheme': 'srm', 'source_scheme_priority': N, 'dest_rse_id': dest_rse_id, 'dest_scheme': 'srm', 'dest_scheme_priority': N}]
     :raises:                    NoDistance
     """
+    if not limit_dest_schemes:
+        limit_dest_schemes = []
+
     shortest_paths = __search_shortest_paths(source_rse_ids=[source_rse_id], dest_rse_id=dest_rse_id,
                                              include_multihop=include_multihop, multihop_rses=multihop_rses,
                                              limit_dest_schemes=limit_dest_schemes, session=session)
@@ -991,7 +994,7 @@ def __search_shortest_paths(source_rse_ids, dest_rse_id, include_multihop, multi
     while priority_q:
         pq_distance, current_node = heappop(priority_q)
 
-        current_distance = next_hop['cumulated_distance']
+        current_distance = next_hop[current_node]['cumulated_distance']
         if pq_distance > current_distance:
             # Lazy deletion.
             # We don't update the priorities in the queue. The same element can be found multiple times,
