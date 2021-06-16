@@ -983,7 +983,7 @@ def __search_shortest_paths(source_rse_ids, dest_rse_id, include_multihop, multi
     else:
         sources_to_find = set(source_rse_ids)
 
-    next_hop = {dest_rse_id: {'distance': 0, 'hop': {}}}
+    next_hop = {dest_rse_id: {'cumulated_distance': 0}}
     priority_q = []
 
     remaining_sources = copy.copy(sources_to_find)
@@ -991,7 +991,7 @@ def __search_shortest_paths(source_rse_ids, dest_rse_id, include_multihop, multi
     while priority_q:
         pq_distance, current_node = heappop(priority_q)
 
-        current_distance = next_hop[current_node]['distance']
+        current_distance = next_hop['cumulated_distance']
         if pq_distance > current_distance:
             # Lazy deletion.
             # We don't update the priorities in the queue. The same element can be found multiple times,
@@ -1016,7 +1016,7 @@ def __search_shortest_paths(source_rse_ids, dest_rse_id, include_multihop, multi
                 continue
 
             new_adjacent_distance = current_distance + link_distance + HOP_PENALTY
-            if next_hop.get(adjacent_node, {'distance': 9999})['distance'] <= new_adjacent_distance:
+            if next_hop.get(adjacent_node, {'cumulated_distance': 9999})['cumulated_distance'] <= new_adjacent_distance:
                 continue
 
             try:
@@ -1029,17 +1029,14 @@ def __search_shortest_paths(source_rse_ids, dest_rse_id, include_multihop, multi
                     scheme=limit_dest_schemes if adjacent_node == dest_rse_id and limit_dest_schemes else None
                 )
                 next_hop[adjacent_node] = {
-                    'distance': new_adjacent_distance,
-                    'hop': {
-                        'source_rse_id': adjacent_node,
-                        'dest_rse_id': current_node,
-                        'source_scheme': matching_scheme[1],
-                        'dest_scheme': matching_scheme[0],
-                        'source_scheme_priority': matching_scheme[3],
-                        'dest_scheme_priority': matching_scheme[2],
-                        'hop_distance': link_distance,
-                        'cumulated_distance': new_adjacent_distance,
-                    }
+                    'source_rse_id': adjacent_node,
+                    'dest_rse_id': current_node,
+                    'source_scheme': matching_scheme[1],
+                    'dest_scheme': matching_scheme[0],
+                    'source_scheme_priority': matching_scheme[3],
+                    'dest_scheme_priority': matching_scheme[2],
+                    'hop_distance': link_distance,
+                    'cumulated_distance': new_adjacent_distance,
                 }
                 heappush(priority_q, (new_adjacent_distance, adjacent_node))
             except RSEProtocolNotSupported:
@@ -1057,9 +1054,9 @@ def __search_shortest_paths(source_rse_ids, dest_rse_id, include_multihop, multi
             continue
 
         path = []
-        while hop.get('hop', {}).get('dest_rse_id'):
-            path.append(hop['hop'])
-            hop = next_hop.get(hop['hop']['dest_rse_id'])
+        while hop.get('dest_rse_id'):
+            path.append(hop)
+            hop = next_hop.get(hop['dest_rse_id'])
         paths[rse_id] = path
     return paths
 
