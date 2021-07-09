@@ -18,6 +18,8 @@
 # - Radu Carpa <radu.carpa@cern.ch>, 2021
 import json
 import logging
+from ctypes import c_char_p
+
 import pytest
 import os
 from rucio.client.downloadclient import DownloadClient
@@ -222,6 +224,49 @@ def test_multiple_protocols_same_scheme(rse_factory, upload_client, mock_scope, 
         'did_scope': str(mock_scope),
         'did_name': name,
         'guid': generate_uuid(),
+    }
+    summary_path = file_factory.base_dir / 'summary'
+    upload_client.upload([item], summary_file_path=summary_path)
+
+    # Verify that the lan protocol was used for the upload
+    with open(summary_path) as json_file:
+        data = json.load(json_file)
+        assert 'file-lan.aperture.com' in data['{}:{}'.format(mock_scope, name)]['pfn']
+
+
+def test_root_file_upload(rse_factory, upload_client, mock_scope, file_factory):
+    """
+    Upload (CLIENT): Ensure that root file upload is correctly handled:
+    the UID is correctly retrieved from the file if it exists.
+    """
+
+    rse, rse_id = rse_factory.make_posix_rse()
+
+    # Create a ROOT file
+    try:
+        from ROOT import TFile, TTree
+    except ImportError:
+        raise pytest.skip("Test requires python ROOT bindings")
+
+    fid = generate_uuid()
+    path = '/tmp/a.pool.root'
+
+    f = TFile.Open(path,'recreate')
+    tree = TTree('##Params','##Params')
+    branch = tree.Branch('db_string', 0, 'db_string/C')
+    for db_value in ['[NAME=LFN][VALUE=randomvalue]', '[NAME=FID][VALUE={}]'.format(fid)]:
+        s = c_char_p(db_value.encode())
+        branch.SetAddress(s)
+        tree.Fill()
+    f.Write()
+    #f.Purge()
+
+    name = os.path.basename(path)
+    item = {
+        'path': path,
+        'rse': rse,
+        'did_scope': str(mock_scope),
+        'did_name': name,
     }
     summary_path = file_factory.base_dir / 'summary'
     upload_client.upload([item], summary_file_path=summary_path)
