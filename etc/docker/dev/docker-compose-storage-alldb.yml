@@ -1,7 +1,7 @@
 version: "3"
 services:
   rucioclient:
-    image: docker.io/rucio/rucio-dev:latest-alma9
+    image: rucio/rucio-dev:latest-alma9
     command: ["sleep", "infinity"]
     volumes:
       - ../../certs/rucio_ca.pem:/etc/grid-security/certificates/5fca1cb1.0:z
@@ -21,9 +21,7 @@ services:
       - X509_USER_KEY=/opt/rucio/etc/userkey.pem
       - RDBMS=postgres14
   rucio:
-    image: docker.io/rucio/rucio-dev:latest-alma9
-    ports:
-      - "127.0.0.1:8443:443"
+    image: rucio/rucio-dev:latest-alma9
     volumes:
       - ../../certs/rucio_ca.pem:/etc/grid-security/certificates/5fca1cb1.0:z
       - ../../certs/hostcert_rucio.pem:/etc/grid-security/hostcert.pem:z
@@ -43,8 +41,6 @@ services:
       - RDBMS=postgres14
   ruciomy8:
     image: docker.io/mysql:8
-    ports:
-      - "127.0.0.1:3308:3308"
     environment:
       - MYSQL_USER=rucio
       - MYSQL_PASSWORD=rucio
@@ -53,8 +49,6 @@ services:
       - MYSQL_TCP_PORT=3308
   oracle:
     image: docker.io/gvenzl/oracle-xe:21-slim
-    ports:
-      - "127.0.0.1:1521:1521"
     environment:
       - ORACLE_PASSWORD=rucio
       - ORACLE_ALLOW_REMOTE=true
@@ -64,8 +58,6 @@ services:
       - transactions=1215
   ruciodb:
     image: docker.io/postgres:14
-    ports:
-      - "127.0.0.1:5432:5432"
     environment:
       - POSTGRES_USER=rucio
       - POSTGRES_DB=rucio
@@ -73,21 +65,14 @@ services:
     command: ["-c", "fsync=off","-c", "synchronous_commit=off","-c", "full_page_writes=off"]
   graphite:
     image: docker.io/graphiteapp/graphite-statsd
-    ports:
-      - "127.0.0.1:8080:80"
   fts:
     image: docker.io/rucio/fts
-    ports:
-      - "127.0.0.1:8446:8446"
-      - "127.0.0.1:8449:8449"
     volumes:
       - ../../certs/rucio_ca.pem:/etc/grid-security/certificates/5fca1cb1.0:z
       - ../../certs/hostcert_fts.pem:/etc/grid-security/hostcert.pem:Z
       - ../../certs/hostcert_fts.key.pem:/etc/grid-security/hostkey.pem:Z
   ftsdb:
     image: docker.io/mysql:8
-    ports:
-      - "127.0.0.1:3306:3306"
     command: --default-authentication-plugin=mysql_native_password
     environment:
       - MYSQL_USER=fts
@@ -96,8 +81,6 @@ services:
       - MYSQL_DATABASE=fts
   xrd1:
     image: docker.io/rucio/xrootd
-    ports:
-      - "127.0.0.1:1094:1094"
     environment:
       - XRDPORT=1094
     volumes:
@@ -106,8 +89,6 @@ services:
       - ../../certs/hostcert_xrd1.key.pem:/tmp/xrdkey.pem:Z
   xrd2:
     image: docker.io/rucio/xrootd
-    ports:
-      - "127.0.0.1:1095:1095"
     environment:
       - XRDPORT=1095
     volumes:
@@ -116,8 +97,6 @@ services:
       - ../../certs/hostcert_xrd2.key.pem:/tmp/xrdkey.pem:Z
   xrd3:
     image: docker.io/rucio/xrootd
-    ports:
-      - "127.0.0.1:1096:1096"
     environment:
       - XRDPORT=1096
     volumes:
@@ -126,8 +105,6 @@ services:
       - ../../certs/hostcert_xrd3.key.pem:/tmp/xrdkey.pem:Z
   xrd4:
     image: docker.io/rucio/xrootd
-    ports:
-      - "127.0.0.1:1097:1097"
     environment:
       - XRDPORT=1097
     volumes:
@@ -136,8 +113,6 @@ services:
       - ../../certs/hostcert_xrd4.key.pem:/tmp/xrdkey.pem:Z
   minio:
     image: docker.io/minio/minio
-    ports:
-      - "127.0.0.1:9000:9000"
     environment:
       - MINIO_ACCESS_KEY=admin
       - MINIO_SECRET_KEY=password
@@ -147,9 +122,6 @@ services:
     command: ["server", "/data"]
   activemq:
     image: docker.io/webcenter/activemq:latest
-    ports:
-      - "127.0.0.1:61613:61613"
-      - "127.0.0.1:8161:8161"
     environment:
       - ACTIVEMQ_CONFIG_NAME=activemq
       - ACTIVEMQ_CONFIG_DEFAULTACCOUNT=false
@@ -160,7 +132,5 @@ services:
       - ACTIVEMQ_CONFIG_SCHEDULERENABLED=true
   ssh1:
     image: docker.io/rucio/ssh
-    ports:
-      - "127.0.0.1:2222:22"
     volumes:
       - ../../certs/ssh/ruciouser_sshkey.pub:/tmp/sshkey.pub:Z
