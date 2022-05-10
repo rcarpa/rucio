@@ -18,17 +18,13 @@ Abacus-RSE is a daemon to update RSE counters.
 """
 
 import logging
-import os
-import socket
 import threading
 import time
-import traceback
 
 import rucio.db.sqla.util
 from rucio.common import exception
-from rucio.common.logging import setup_logging, formatted_logger
-from rucio.common.utils import get_thread_with_periodic_running_function, daemon_sleep
-from rucio.core.heartbeat import live, die, sanity_check
+from rucio.common.logging import setup_logging
+from rucio.common.utils import get_thread_with_periodic_running_function
 from rucio.core.rse_counter import get_updated_rse_counters, update_rse_counter, fill_rse_counter_history_table
 from rucio.daemons.common import run_daemon
 

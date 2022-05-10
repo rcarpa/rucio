@@ -18,17 +18,12 @@ Abacus-Collection-Replica is a daemon to update collection replica.
 """
 import functools
 import logging
-import os
-import socket
 import threading
 import time
-import traceback
 
 import rucio.db.sqla.util
 from rucio.common import exception
-from rucio.common.logging import setup_logging, formatted_logger
-from rucio.common.utils import daemon_sleep
-from rucio.core.heartbeat import live, die, sanity_check
+from rucio.common.logging import setup_logging
 from rucio.core.replica import get_cleaned_updated_collection_replicas, update_collection_replica
 from rucio.daemons.common import run_daemon
 
