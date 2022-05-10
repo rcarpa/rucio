@@ -63,7 +63,7 @@ def run_once(heartbeat_handler, **_kwargs):
             # If the list is empty, sent the worker to sleep
             if not account_rse_ids:
                 logger(logging.INFO, 'did not get any work')
-                daemon_sleep(start_time=start, sleep_time=sleep_time, graceful_stop=graceful_stop)
+                return
             else:
                 for account_rse_id in account_rse_ids:
                     worker_number, total_workers, logger = heartbeat_handler.live()

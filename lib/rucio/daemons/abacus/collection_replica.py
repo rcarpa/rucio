@@ -67,7 +67,8 @@ def run_once(heartbeat_handler, limit, **_kwargs):
             # If the list is empty, sent the worker to sleep
             if not replicas:
                 logger(logging.INFO, 'did not get any work')
-                daemon_sleep(start_time=start, sleep_time=sleep_time, graceful_stop=graceful_stop)
+                must_sleep = True
+                return must_sleep
             else:
                 for replica in replicas:
                     worker_number, total_workers, logger = heartbeat_handler.live()
@@ -76,8 +77,10 @@ def run_once(heartbeat_handler, limit, **_kwargs):
                     start_time = time.time()
                     update_collection_replica(replica)
                     logger(logging.DEBUG, 'update of collection replica "%s" took %f' % (replica['id'], time.time() - start_time))
+                must_sleep = False
                 if limit and len(replicas) < limit:
-                    daemon_sleep(start_time=start, sleep_time=sleep_time, graceful_stop=graceful_stop)
+                    must_sleep = True
+                return must_sleep
 
 
 def stop(signum=None, frame=None):
