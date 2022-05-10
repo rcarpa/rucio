@@ -53,15 +53,15 @@ def account_update(once=False, sleep_time=10):
 def run_once(heartbeat_handler, **_kwargs):
     worker_number, total_workers, logger = heartbeat_handler.live()
 
-    while not graceful_stop.is_set():
-        try:
+    if True:
+        if True:
             start = time.time()  # NOQA
             account_rse_ids = get_updated_account_counters(total_workers=total_workers,
                                                            worker_number=worker_number)
             logger(logging.DEBUG, 'Index query time %f size=%d' % (time.time() - start, len(account_rse_ids)))
 
             # If the list is empty, sent the worker to sleep
-            if not account_rse_ids and not once:
+            if not account_rse_ids:
                 logger(logging.INFO, 'did not get any work')
                 daemon_sleep(start_time=start, sleep_time=sleep_time, graceful_stop=graceful_stop)
             else:
@@ -72,11 +72,6 @@ def run_once(heartbeat_handler, **_kwargs):
                     start_time = time.time()
                     update_account_counter(account=account_rse_id[0], rse_id=account_rse_id[1])
                     logger(logging.DEBUG, 'update of account-rse counter "%s-%s" took %f' % (account_rse_id[0], account_rse_id[1], time.time() - start_time))
-        except Exception:
-            logger(logging.ERROR, traceback.format_exc())
-
-        if once:
-            break
 
 
 def stop(signum=None, frame=None):

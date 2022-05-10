@@ -55,8 +55,8 @@ def collection_replica_update(once=False, limit=1000, sleep_time=10):
 
 def run_once(heartbeat_handler, limit, **_kwargs):
     worker_number, total_workers, logger = heartbeat_handler.live()
-    while not graceful_stop.is_set():
-        try:
+    if True:
+        if True:
             # Select a bunch of collection replicas for to update for this worker
             start = time.time()  # NOQA
             replicas = get_cleaned_updated_collection_replicas(total_workers=total_workers - 1,
@@ -65,7 +65,7 @@ def run_once(heartbeat_handler, limit, **_kwargs):
 
             logger(logging.DEBUG, 'Index query time %f size=%d' % (time.time() - start, len(replicas)))
             # If the list is empty, sent the worker to sleep
-            if not replicas and not once:
+            if not replicas:
                 logger(logging.INFO, 'did not get any work')
                 daemon_sleep(start_time=start, sleep_time=sleep_time, graceful_stop=graceful_stop)
             else:
@@ -76,13 +76,8 @@ def run_once(heartbeat_handler, limit, **_kwargs):
                     start_time = time.time()
                     update_collection_replica(replica)
                     logger(logging.DEBUG, 'update of collection replica "%s" took %f' % (replica['id'], time.time() - start_time))
-                if limit and len(replicas) < limit and not once:
+                if limit and len(replicas) < limit:
                     daemon_sleep(start_time=start, sleep_time=sleep_time, graceful_stop=graceful_stop)
-
-        except Exception:
-            logger(logging.ERROR, traceback.format_exc())
-        if once:
-            break
 
 
 def stop(signum=None, frame=None):

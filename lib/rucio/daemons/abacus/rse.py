@@ -53,8 +53,8 @@ def rse_update(once=False, sleep_time=10):
 def run_once(heartbeat_handler, **_kwargs):
     worker_number, total_workers, logger = heartbeat_handler.live()
 
-    while not graceful_stop.is_set():
-        try:
+    if True:
+        if True:
             # Select a bunch of rses for to update for this worker
             start = time.time()  # NOQA
             rse_ids = get_updated_rse_counters(total_workers=total_workers,
@@ -62,7 +62,7 @@ def run_once(heartbeat_handler, **_kwargs):
             logger(logging.DEBUG, 'Index query time %f size=%d' % (time.time() - start, len(rse_ids)))
 
             # If the list is empty, sent the worker to sleep
-            if not rse_ids and not once:
+            if not rse_ids:
                 logger(logging.INFO, 'did not get any work')
                 daemon_sleep(start_time=start, sleep_time=sleep_time, graceful_stop=graceful_stop)
             else:
@@ -73,10 +73,6 @@ def run_once(heartbeat_handler, **_kwargs):
                     start_time = time.time()
                     update_rse_counter(rse_id=rse_id)
                     logger(logging.DEBUG, 'update of rse "%s" took %f' % (rse_id, time.time() - start_time))
-        except Exception:
-            logger(logging.ERROR, traceback.format_exc())
-        if once:
-            break
 
 
 def stop(signum=None, frame=None):
