@@ -51,13 +51,14 @@ def rse_update(once=False, sleep_time=10):
 
 
 def run_once(heartbeat_handler, **_kwargs):
+    worker_number, total_workers, logger = heartbeat_handler.live()
 
     while not graceful_stop.is_set():
         try:
             # Select a bunch of rses for to update for this worker
             start = time.time()  # NOQA
-            rse_ids = get_updated_rse_counters(total_workers=heartbeat['nr_threads'],
-                                               worker_number=heartbeat['assign_thread'])
+            rse_ids = get_updated_rse_counters(total_workers=total_workers,
+                                               worker_number=worker_number)
             logger(logging.DEBUG, 'Index query time %f size=%d' % (time.time() - start, len(rse_ids)))
 
             # If the list is empty, sent the worker to sleep
@@ -66,6 +67,7 @@ def run_once(heartbeat_handler, **_kwargs):
                 daemon_sleep(start_time=start, sleep_time=sleep_time, graceful_stop=graceful_stop)
             else:
                 for rse_id in rse_ids:
+                    worker_number, total_workers, logger = heartbeat_handler.live()
                     if graceful_stop.is_set():
                         break
                     start_time = time.time()

@@ -54,12 +54,13 @@ def collection_replica_update(once=False, limit=1000, sleep_time=10):
 
 
 def run_once(heartbeat_handler, limit, **_kwargs):
+    worker_number, total_workers, logger = heartbeat_handler.live()
     while not graceful_stop.is_set():
         try:
             # Select a bunch of collection replicas for to update for this worker
             start = time.time()  # NOQA
-            replicas = get_cleaned_updated_collection_replicas(total_workers=heartbeat['nr_threads'] - 1,
-                                                               worker_number=heartbeat['assign_thread'],
+            replicas = get_cleaned_updated_collection_replicas(total_workers=total_workers - 1,
+                                                               worker_number=worker_number,
                                                                limit=limit)
 
             logger(logging.DEBUG, 'Index query time %f size=%d' % (time.time() - start, len(replicas)))
@@ -69,6 +70,7 @@ def run_once(heartbeat_handler, limit, **_kwargs):
                 daemon_sleep(start_time=start, sleep_time=sleep_time, graceful_stop=graceful_stop)
             else:
                 for replica in replicas:
+                    worker_number, total_workers, logger = heartbeat_handler.live()
                     if graceful_stop.is_set():
                         break
                     start_time = time.time()
