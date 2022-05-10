@@ -54,21 +54,8 @@ def collection_replica_update(once=False, limit=1000, sleep_time=10):
 
 
 def run_once(heartbeat_handler, limit, **_kwargs):
-    # Make an initial heartbeat so that all abacus-collection-replica daemons have the correct worker number on the next try
-    executable = 'abacus-collection-replica'
-    hostname = socket.gethostname()
-    pid = os.getpid()
-    current_thread = threading.current_thread()
-    live(executable=executable, hostname=hostname, pid=pid, thread=current_thread)
-
     while not graceful_stop.is_set():
         try:
-            # Heartbeat
-            heartbeat = live(executable=executable, hostname=hostname, pid=pid, thread=current_thread)
-
-            prepend_str = 'collection_replica_update[%i/%i] : ' % (heartbeat['assign_thread'], heartbeat['nr_threads'])
-            logger = formatted_logger(logging.log, prepend_str + '%s')
-
             # Select a bunch of collection replicas for to update for this worker
             start = time.time()  # NOQA
             replicas = get_cleaned_updated_collection_replicas(total_workers=heartbeat['nr_threads'] - 1,
@@ -95,10 +82,6 @@ def run_once(heartbeat_handler, limit, **_kwargs):
         if once:
             break
 
-    logging.info('collection_replica_update: graceful stop requested')
-    die(executable=executable, hostname=hostname, pid=pid, thread=current_thread)
-    logging.info('collection_replica_update: graceful stop done')
-
 
 def stop(signum=None, frame=None):
     """
@@ -116,10 +99,6 @@ def run(once=False, threads=1, sleep_time=10, limit=1000):
 
     if rucio.db.sqla.util.is_old_db():
         raise exception.DatabaseException('Database was not updated, daemon won\'t start')
-
-    executable = 'abacus-collection-replica'
-    hostname = socket.gethostname()
-    sanity_check(executable=executable, hostname=hostname)
 
     if once:
         logging.info('main: executing one iteration only')

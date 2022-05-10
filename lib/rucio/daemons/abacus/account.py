@@ -51,22 +51,9 @@ def account_update(once=False, sleep_time=10):
 
 
 def run_once(heartbeat_handler, **_kwargs):
-    # Make an initial heartbeat so that all abacus-account daemons have the correct worker number on the next try
-    executable = 'abacus-account'
-    hostname = socket.gethostname()
-    pid = os.getpid()
-    current_thread = threading.current_thread()
-    live(executable=executable, hostname=hostname, pid=pid, thread=current_thread)
 
     while not graceful_stop.is_set():
         try:
-            # Heartbeat
-            heartbeat = live(executable=executable, hostname=hostname, pid=pid, thread=current_thread)
-
-            prepend_str = 'account_update[%i/%i] : ' % (heartbeat['assign_thread'], heartbeat['nr_threads'])
-            logger = formatted_logger(logging.log, prepend_str + '%s')
-
-            # Select a bunch of rses for to update for this worker
             start = time.time()  # NOQA
             account_rse_ids = get_updated_account_counters(total_workers=heartbeat['nr_threads'],
                                                            worker_number=heartbeat['assign_thread'])
@@ -89,10 +76,6 @@ def run_once(heartbeat_handler, **_kwargs):
         if once:
             break
 
-    logging.info('account_update: graceful stop requested')
-    die(executable=executable, hostname=hostname, pid=pid, thread=current_thread)
-    logging.info('account_update: graceful stop done')
-
 
 def stop(signum=None, frame=None):
     """
@@ -110,10 +93,6 @@ def run(once=False, threads=1, fill_history_table=False, sleep_time=10):
 
     if rucio.db.sqla.util.is_old_db():
         raise exception.DatabaseException('Database was not updated, daemon won\'t start')
-
-    executable = 'abacus-account'
-    hostname = socket.gethostname()
-    sanity_check(executable=executable, hostname=hostname)
 
     if once:
         logging.info('main: executing one iteration only')
