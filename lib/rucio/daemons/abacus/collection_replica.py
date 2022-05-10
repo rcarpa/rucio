@@ -16,7 +16,7 @@
 """
 Abacus-Collection-Replica is a daemon to update collection replica.
 """
-
+import functools
 import logging
 import os
 import socket
@@ -30,6 +30,7 @@ from rucio.common.logging import setup_logging, formatted_logger
 from rucio.common.utils import daemon_sleep
 from rucio.core.heartbeat import live, die, sanity_check
 from rucio.core.replica import get_cleaned_updated_collection_replicas, update_collection_replica
+from rucio.daemons.common import run_daemon
 
 graceful_stop = threading.Event()
 
@@ -38,7 +39,21 @@ def collection_replica_update(once=False, limit=1000, sleep_time=10):
     """
     Main loop to check and update the collection replicas.
     """
+    run_daemon(
+        once=once,
+        graceful_stop=graceful_stop,
+        executable='abacus-collection-replica',
+        logger_prefix='collection_replica_update',
+        partition_wait_time=1,
+        sleep_time=sleep_time,
+        run_once_fnc=functools.partial(
+            run_once,
+            limit=limit,
+        ),
+    )
 
+
+def run_once(heartbeat_handler, limit, **_kwargs):
     # Make an initial heartbeat so that all abacus-collection-replica daemons have the correct worker number on the next try
     executable = 'abacus-collection-replica'
     hostname = socket.gethostname()

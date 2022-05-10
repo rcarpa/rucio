@@ -30,6 +30,7 @@ from rucio.common.logging import setup_logging, formatted_logger
 from rucio.common.utils import get_thread_with_periodic_running_function, daemon_sleep
 from rucio.core.account_counter import get_updated_account_counters, update_account_counter, fill_account_counter_history_table
 from rucio.core.heartbeat import live, die, sanity_check
+from rucio.daemons.common import run_daemon
 
 graceful_stop = threading.Event()
 
@@ -38,7 +39,18 @@ def account_update(once=False, sleep_time=10):
     """
     Main loop to check and update the Account Counters.
     """
+    run_daemon(
+        once=once,
+        graceful_stop=graceful_stop,
+        executable='abacus-account',
+        logger_prefix='account_update',
+        partition_wait_time=1,
+        sleep_time=sleep_time,
+        run_once_fnc=run_once,
+    )
 
+
+def run_once(heartbeat_handler, **_kwargs):
     # Make an initial heartbeat so that all abacus-account daemons have the correct worker number on the next try
     executable = 'abacus-account'
     hostname = socket.gethostname()
