@@ -389,3 +389,77 @@ def test_fk_error_on_source_creation(rse_factory, did_factory, root_account):
     transfer_path[0].rws.request_id = generate_uuid()
     to_submit, *_ = assign_paths_to_transfertool_and_create_hops(requests, default_tombstone_delay=0)
     assert not to_submit
+
+
+@pytest.mark.parametrize("core_config_mock", [{"table_content": [
+    ('transfers', 'use_multihop', True)
+]}], indirect=True)
+@pytest.mark.parametrize("caches_mock", [{"caches_to_mock": [
+    'rucio.core.rse_expression_parser.REGION',  # The list of multihop RSEs is retrieved by an expression
+    'rucio.core.config.REGION',
+]}], indirect=True)
+def test_topology(rse_factory, did_factory, root_account, vo, caches_mock, core_config_mock):
+    from rucio.core.request import get_request_stats
+    from collections import defaultdict
+
+    from rucio.core.rse import list_rses
+
+    topology = Topology(rse_ids=[rse['id'] for rse in list_rses()]).configure_multihop().reload_distances()
+
+    rse1_name = 'XRD1'
+    rse1_id = rse_core.get_rse_id(rse=rse1_name, vo=vo)
+    rse2_name = 'XRD2'
+    rse2_id = rse_core.get_rse_id(rse=rse2_name, vo=vo)
+    rse3_name = 'XRD3'
+    rse3_id = rse_core.get_rse_id(rse=rse3_name, vo=vo)
+    rse4_name = 'XRD4'
+    rse4_id = rse_core.get_rse_id(rse=rse4_name, vo=vo)
+
+    rse1 = topology[rse1_id]
+    rse2 = topology[rse2_id]
+    rse3 = topology[rse3_id]
+    rse4 = topology[rse4_id]
+
+    db_stats = get_request_stats(
+        state=[RequestState.QUEUED,
+               RequestState.SUBMITTING,
+               RequestState.SUBMITTED,
+               RequestState.WAITING],
+    )
+
+    pending_transfers = defaultdict(float)
+    for db_stat in db_stats:
+
+        if (db_stat.dest_rse_id not in topology) or (db_stat.source_rse_id and db_stat.source_rse_id not in topology):
+            # The RSE was deleted. Ignore
+            continue
+
+        src_node = topology[db_stat.source_rse_id] if db_stat.source_rse_id else None
+        dst_node = topology[db_stat.dest_rse_id]
+        if src_node:
+            edge = topology.get_or_create_edge(src_node, dst_node)
+            if edge:
+                edge.usage += db_stat.bytes
+                # add usage to src and dst rse
+        else:
+            pending_transfers[dst_node] += db_stat.bytes
+
+    demand = {
+        rse1: {
+            rse2: 10**9,
+            rse3: 10**9,
+            rse4: 10**9
+        },
+        #rse2: {
+        #    rse1: 10**8,
+        #    rse3: 10**8,
+        #    rse4: 10**8
+        #}
+    }
+    rse1.capacity = 10 ** 10
+    rse2.capacity = 10 ** 9
+    rse3.capacity = 10 ** 8
+    rse4.capacity = 10 ** 9
+    topology.ensure_loaded(load_name=True, load_columns=True, load_usage=True, load_info=True, load_attributes=True, load_limits=True)
+    a = topology.karakostas_multicommodity_flow(demand)
+    print(pending_transfers)
