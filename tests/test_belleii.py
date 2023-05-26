@@ -21,7 +21,7 @@ from rucio.common.exception import InvalidObject
 from rucio.common.schema.belleii import validate_schema
 from rucio.common.utils import generate_uuid, extract_scope
 from rucio.core.config import set as config_set
-from rucio.tests.common import did_name_generator, skip_non_belleii
+from .common import did_name_generator, skip_non_belleii
 
 
 @skip_non_belleii

@@ -27,7 +27,7 @@ from rucio.core.did import list_dids, list_files, get_metadata
 from rucio.core.scope import add_scope
 from rucio.daemons.automatix.automatix import automatix
 from rucio.rse import rsemanager as rsemgr
-from rucio.tests.common import scope_name_generator
+from .common import scope_name_generator
 
 
 @pytest.mark.noparallel(reason='changes global configuration value')

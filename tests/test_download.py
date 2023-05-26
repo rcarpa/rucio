@@ -34,7 +34,7 @@ from rucio.core.rse import add_protocol
 from rucio.client.downloadclient import FileDownloadState
 from rucio.rse import rsemanager as rsemgr
 from rucio.rse.protocols.posix import Default as PosixProtocol
-from rucio.tests.common import skip_rse_tests_with_accounts, scope_name_generator, file_generator
+from .common import skip_rse_tests_with_accounts, scope_name_generator, file_generator
 
 
 @pytest.fixture

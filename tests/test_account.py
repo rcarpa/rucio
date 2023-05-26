@@ -25,7 +25,7 @@ from rucio.common.utils import generate_uuid as uuid
 from rucio.core.account import list_identities, add_account_attribute, list_account_attributes, del_account_attribute
 from rucio.core.identity import add_account_identity, add_identity
 from rucio.db.sqla.constants import AccountStatus, IdentityType
-from rucio.tests.common import account_name_generator, headers, auth, vohdr, loginhdr
+from .common import account_name_generator, headers, auth, vohdr, loginhdr
 
 
 class TestAccountCoreApi:

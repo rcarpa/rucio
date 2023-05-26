@@ -24,8 +24,8 @@ from rucio.common.utils import generate_uuid as uuid
 from rucio.core.account import add_account, del_account
 from rucio.core.identity import add_identity, del_identity, add_account_identity, del_account_identity, list_identities, verify_identity
 from rucio.db.sqla.constants import AccountType, IdentityType
-from rucio.tests.common import account_name_generator, headers, hdrdict, auth
-from rucio.tests.common_server import get_vo
+from .common import account_name_generator, headers, hdrdict, auth
+from .common_server import get_vo
 from rucio.common.exception import IdentityNotFound, IdentityError
 
 

@@ -36,7 +36,7 @@ from rucio.daemons.reaper.dark_reaper import reaper as dark_reaper
 from rucio.daemons.reaper.reaper import run as run_reaper
 from rucio.db.sqla.models import ConstituentAssociationHistory
 from rucio.db.sqla.session import read_session
-from rucio.tests.common import rse_name_generator
+from .common import rse_name_generator
 
 __mock_protocol = {'scheme': 'MOCK',
                    'hostname': 'localhost',

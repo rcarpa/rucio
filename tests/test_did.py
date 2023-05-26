@@ -32,7 +32,7 @@ from rucio.core.did import (list_dids, add_did, delete_dids, get_did_atime, touc
                             set_new_dids)
 from rucio.core.replica import add_replica, get_replica
 from rucio.db.sqla.constants import DIDType
-from rucio.tests.common import rse_name_generator, scope_name_generator, did_name_generator
+from .common import rse_name_generator, scope_name_generator, did_name_generator
 
 
 def skip_without_json():

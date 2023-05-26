@@ -28,7 +28,7 @@ from rucio.core.request import (queue_requests, get_request_by_did, release_wait
 from rucio.daemons.conveyor import throttler, preparer
 from rucio.db.sqla import models
 from rucio.db.sqla.constants import DIDType, RequestType, RequestState, TransferLimitDirection
-from rucio.tests.common import skiplimitedsql
+from .common import skiplimitedsql
 
 
 @pytest.fixture

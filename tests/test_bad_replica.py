@@ -30,7 +30,7 @@ from rucio.daemons.badreplicas.minos_temporary_expiration import run as minos_te
 from rucio.daemons.badreplicas.necromancer import run as necromancer_run
 from rucio.daemons.badreplicas.necromancer import REGION
 from rucio.db.sqla.constants import DIDType, ReplicaState, BadPFNStatus, BadFilesStatus
-from rucio.tests.common import headers, auth
+from .common import headers, auth
 
 
 @pytest.fixture

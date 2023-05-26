@@ -25,7 +25,7 @@ from rucio.core.request import queue_requests, get_request_by_did, list_requests
 from rucio.core.rse import add_rse_attribute
 from rucio.db.sqla import models, constants
 from rucio.db.sqla.constants import RequestType, RequestState
-from rucio.tests.common import vohdr, hdrdict, headers, auth
+from .common import vohdr, hdrdict, headers, auth
 
 
 @pytest.mark.parametrize("file_config_mock", [

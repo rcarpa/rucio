@@ -44,11 +44,11 @@ from rucio.db.sqla import models
 from rucio.db.sqla.constants import DIDType, ReplicaState, BadPFNStatus, OBSOLETE
 from rucio.db.sqla.session import transactional_session
 from rucio.rse import rsemanager as rsemgr
-from rucio.tests.common import execute, headers, auth, Mime, accept, did_name_generator
+from .common import execute, headers, auth, Mime, accept, did_name_generator
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from rucio.tests.temp_factories import TemporaryRSEFactory
+    from .temp_factories import TemporaryRSEFactory
 
 
 def mocked_VP_requests_get(*args, **kwargs):

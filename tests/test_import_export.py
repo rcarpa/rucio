@@ -33,7 +33,7 @@ from rucio.core.rse import get_rse_id, get_rse_name, add_rse, get_rse, add_proto
     get_rse_attribute
 from rucio.db.sqla import session, models
 from rucio.db.sqla.constants import RSEType, AccountType, IdentityType, AccountStatus
-from rucio.tests.common import rse_name_generator, headers, auth, hdrdict
+from .common import rse_name_generator, headers, auth, hdrdict
 
 
 def check_rse(rse_name, test_data, vo='def'):

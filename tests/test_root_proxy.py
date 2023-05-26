@@ -21,7 +21,7 @@ from rucio.common.types import InternalAccount, InternalScope
 from rucio.core.config import set as config_set
 from rucio.core.replica import add_replicas, delete_replicas
 from rucio.core.rse import add_rse, add_rse_attribute, del_rse, add_protocol
-from rucio.tests.common import rse_name_generator, vohdr, headers
+from .common import rse_name_generator, vohdr, headers
 
 client_location_without_proxy = {'ip': '192.168.0.1',
                                  'fqdn': 'anomalous-materials.blackmesa.com',

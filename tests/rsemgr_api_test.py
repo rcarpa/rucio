@@ -25,7 +25,7 @@ import pytest
 from rucio.common import exception
 from rucio.common.utils import adler32, md5
 from rucio.rse import rsemanager as mgr
-from rucio.tests.common import skip_rse_tests_with_accounts, load_test_conf_file
+from .common import skip_rse_tests_with_accounts, load_test_conf_file
 
 
 @skip_rse_tests_with_accounts

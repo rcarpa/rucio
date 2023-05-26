@@ -48,13 +48,13 @@ from rucio.daemons.judge.evaluator import re_evaluator
 from rucio.db.sqla import models
 from rucio.db.sqla.constants import DIDType, OBSOLETE, RuleState, LockState
 from rucio.db.sqla.session import transactional_session
-from rucio.tests.common import rse_name_generator, account_name_generator, did_name_generator
-from rucio.tests.common_server import get_vo
+from .common import rse_name_generator, account_name_generator, did_name_generator
+from .common_server import get_vo
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Tuple
-    from rucio.tests.temp_factories import TemporaryDidFactory, TemporaryRSEFactory
+    from .temp_factories import TemporaryDidFactory, TemporaryRSEFactory
 
 LOG = getLogger(__name__)
 RSE_namedtuple = namedtuple('RSE_namedtuple', ['name', 'id'])

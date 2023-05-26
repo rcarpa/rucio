@@ -22,7 +22,7 @@ from rucio.common.utils import generate_uuid
 from rucio.core.rse import get_rse_id
 from rucio.core.temporary_did import (add_temporary_dids, compose, delete_temporary_dids,
                                       list_expired_temporary_dids)
-from rucio.tests.common_server import get_vo
+from .common_server import get_vo
 
 
 @pytest.mark.noparallel(reason='uses pre-defined RSE')

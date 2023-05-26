@@ -24,7 +24,7 @@ from configparser import NoSectionError
 from rucio.common.exception import UnsupportedOperation, ConfigNotFound
 from rucio.common.policy import REGION
 from rucio.common.utils import generate_uuid as uuid
-from rucio.tests.common import skip_multivo
+from .common import skip_multivo
 from rucio.core import config as config_core
 from rucio.core.rule import add_rule, get_rule
 from rucio.core.did import set_metadata, get_metadata

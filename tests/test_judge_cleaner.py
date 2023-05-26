@@ -25,8 +25,8 @@ from rucio.core.rse import add_rse_attribute
 from rucio.core.rule import add_rule, update_rule
 from rucio.daemons.judge.cleaner import rule_cleaner
 from rucio.db.sqla.constants import DIDType
-from rucio.tests.common_server import get_vo
-from rucio.tests.test_rule import create_files, tag_generator
+from .common_server import get_vo
+from .test_rule import create_files, tag_generator
 
 
 @pytest.fixture(scope="class")

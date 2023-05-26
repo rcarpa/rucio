@@ -29,8 +29,8 @@ from rucio.core import did as did_core
 from rucio.db.sqla import models
 from rucio.db.sqla.constants import DIDType
 from rucio.db.sqla.session import transactional_session
-from rucio.tests.common import did_name_generator
-from rucio.tests.common_server import cleanup_db_deps
+from .common import did_name_generator
+from .common_server import cleanup_db_deps
 from sqlalchemy import and_, or_, delete
 
 from typing import TYPE_CHECKING

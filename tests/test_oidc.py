@@ -35,7 +35,7 @@ from rucio.db.sqla import models
 from rucio.db.sqla.constants import AccountType
 from rucio.db.sqla.constants import IdentityType
 from rucio.db.sqla.session import get_session
-from rucio.tests.common_server import get_vo
+from .common_server import get_vo
 
 NEW_TOKEN_DICT = {'access_token': 'eyJ3bG...',
                   'expires_in': 3599,

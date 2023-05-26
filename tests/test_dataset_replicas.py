@@ -27,7 +27,7 @@ from rucio.core.replica import list_datasets_per_rse, update_collection_replica,
 from rucio.core.rse import add_rse, del_rse, add_protocol, get_rse_id
 from rucio.db.sqla import models, constants
 from rucio.db.sqla.constants import ReplicaState
-from rucio.tests.common import rse_name_generator, did_name_generator
+from .common import rse_name_generator, did_name_generator
 
 
 class TestDatasetReplicaClient:

@@ -19,8 +19,8 @@ import shutil
 import pytest
 
 from rucio.rse import rsemanager as mgr
-from rucio.tests.common import skip_rse_tests_with_accounts, load_test_conf_file
-from rucio.tests.rsemgr_api_test import MgrTestCases
+from .common import skip_rse_tests_with_accounts, load_test_conf_file
+from .rsemgr_api_test import MgrTestCases
 
 
 def setup_posix_test_env(rse_name, rse_settings, user):

@@ -28,7 +28,7 @@ from rucio.core.rule import add_rules, list_rules
 from rucio.daemons.judge.cleaner import rule_cleaner
 from rucio.daemons.undertaker.undertaker import undertaker
 from rucio.db.sqla.util import json_implemented
-from rucio.tests.common import rse_name_generator, did_name_generator
+from .common import rse_name_generator, did_name_generator
 
 LOG = getLogger(__name__)
 

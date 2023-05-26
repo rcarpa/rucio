@@ -33,7 +33,7 @@ from rucio.common.config import config_get, config_get_bool
 from rucio.common.types import InternalScope, InternalAccount
 from rucio.common.utils import generate_uuid, get_tmp_dir, md5, render_json
 from rucio.rse import rsemanager as rsemgr
-from rucio.tests.common import execute, account_name_generator, rse_name_generator, file_generator, scope_name_generator, get_long_vo
+from .common import execute, account_name_generator, rse_name_generator, file_generator, scope_name_generator, get_long_vo
 
 
 class TestBinRucio:
@@ -43,7 +43,7 @@ class TestBinRucio:
         if config_get_bool('common', 'multi_vo', raise_exception=False, default=False):
             if 'SUITE' not in environ or environ['SUITE'] != 'client':
                 # Server test, we can use short VO via DB for internal tests
-                from rucio.tests.common_server import get_vo
+                from .common_server import get_vo
                 self.vo = {'vo': get_vo()}
             else:
                 # Client-only test, only use config with no DB config
@@ -75,7 +75,7 @@ class TestBinRucio:
         self.account_client = AccountLimitClient()
         rse_factory = None
         if environ.get('SUITE', 'remote_dbs') != 'client':
-            from rucio.tests.temp_factories import TemporaryRSEFactory
+            from .temp_factories import TemporaryRSEFactory
 
             rse_factory = TemporaryRSEFactory(vo=vo, name_prefix=function_scope_prefix)
             self.def_rse, self.def_rse_id = rse_factory.make_posix_rse()

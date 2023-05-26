@@ -29,7 +29,7 @@ from rucio.core.identity import add_account_identity, del_account_identity
 from rucio.core.authentication import strip_x509_proxy_attributes
 from rucio.db.sqla import models
 from rucio.db.sqla.constants import IdentityType
-from rucio.tests.common import headers, hdrdict, loginhdr, vohdr
+from .common import headers, hdrdict, loginhdr, vohdr
 
 PUBLIC_KEY = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq5LySllrQFpPL"\
              "614sulXQ7wnIr1aGhGtl8b+HCB/0FhMSMTHwSjX78UbfqEorZ"\

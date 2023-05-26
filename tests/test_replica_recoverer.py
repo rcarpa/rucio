@@ -27,7 +27,7 @@ from rucio.core.did import set_metadata
 from rucio.core import rse_expression_parser
 from rucio.daemons.replicarecoverer.suspicious_replica_recoverer import run, stop
 from rucio.db.sqla.constants import DIDType, BadFilesStatus, ReplicaState
-from rucio.tests.common import execute
+from .common import execute
 
 
 class TestReplicaRecoverer:

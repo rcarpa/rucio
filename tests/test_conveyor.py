@@ -46,7 +46,7 @@ from rucio.daemons.reaper.reaper import reaper
 from rucio.db.sqla import models
 from rucio.db.sqla.constants import LockState, RequestState, RequestType, ReplicaState, RSEType, RuleState
 from rucio.db.sqla.session import read_session, transactional_session
-from rucio.tests.common import skip_rse_tests_with_accounts
+from .common import skip_rse_tests_with_accounts
 from rucio.transfertool.fts3 import FTS3Transfertool
 
 MAX_POLL_WAIT_SECONDS = 60

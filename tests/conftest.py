@@ -76,11 +76,11 @@ def function_scope_prefix(request, class_scope_prefix):
 def vo():
     if environ.get('SUITE', 'remote_dbs') != 'client':
         # Server test, we can use short VO via DB for internal tests
-        from rucio.tests.common_server import get_vo
+        from .common_server import get_vo
         return get_vo()
     else:
         # Client-only test, only use config with no DB config
-        from rucio.tests.common import get_long_vo
+        from .common import get_long_vo
         return get_long_vo()
 
 
@@ -100,7 +100,7 @@ def second_vo():
 
 @pytest.fixture(scope='session')
 def long_vo():
-    from rucio.tests.common import get_long_vo
+    from .common import get_long_vo
     return get_long_vo()
 
 
@@ -154,7 +154,7 @@ def dirac_client():
 
 @pytest.fixture
 def rest_client():
-    from rucio.tests.common import print_response
+    from .common import print_response
 
     from flask.testing import FlaskClient
     from rucio.web.rest.flaskapi.v1.main import application
@@ -183,7 +183,7 @@ def rest_client():
 
 @pytest.fixture
 def auth_token(rest_client, long_vo):
-    from rucio.tests.common import vohdr, headers, loginhdr
+    from .common import vohdr, headers, loginhdr
 
     auth_response = rest_client.get('/auth/userpass', headers=headers(loginhdr('root', 'ddmlab', 'secret'), vohdr(long_vo)))
     assert auth_response.status_code == 200
@@ -229,7 +229,7 @@ def random_account(vo):
     from rucio.core.account import add_account, del_account
     from rucio.db.sqla import models
     from rucio.db.sqla.constants import AccountType
-    from rucio.tests.common_server import cleanup_db_deps
+    from .common_server import cleanup_db_deps
 
     account = InternalAccount(''.join(random.choice(string.ascii_uppercase) for _ in range(10)), vo=vo)
     add_account(account=account, type_=AccountType.USER, email=f'{account.external}@email.com')
@@ -267,7 +267,7 @@ def containerized_rses(rucio_client):
 
 @pytest.fixture
 def rse_factory(request, vo, function_scope_prefix):
-    from rucio.tests.temp_factories import TemporaryRSEFactory
+    from .temp_factories import TemporaryRSEFactory
 
     session = None
     if 'db_session' in request.fixturenames:
@@ -282,7 +282,7 @@ def rse_factory_unittest(request, vo, class_scope_prefix):
     """
     unittest classes can get access to rse_factory fixture via this fixture
     """
-    from rucio.tests.temp_factories import TemporaryRSEFactory
+    from .temp_factories import TemporaryRSEFactory
 
     with TemporaryRSEFactory(vo=vo, name_prefix=class_scope_prefix) as factory:
         request.cls.rse_factory = factory
@@ -291,7 +291,7 @@ def rse_factory_unittest(request, vo, class_scope_prefix):
 
 @pytest.fixture
 def did_factory(request, vo, mock_scope, function_scope_prefix, file_factory, root_account):
-    from rucio.tests.temp_factories import TemporaryDidFactory
+    from .temp_factories import TemporaryDidFactory
 
     session = None
     if 'db_session' in request.fixturenames:
@@ -304,7 +304,7 @@ def did_factory(request, vo, mock_scope, function_scope_prefix, file_factory, ro
 
 @pytest.fixture
 def file_factory(tmp_path_factory):
-    from rucio.tests.temp_factories import TemporaryFileFactory
+    from .temp_factories import TemporaryFileFactory
 
     with TemporaryFileFactory(pytest_path_factory=tmp_path_factory) as factory:
         yield factory

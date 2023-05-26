@@ -19,7 +19,7 @@ import re
 import pytest
 
 from rucio.common.utils import generate_uuid as uuid, execute
-from rucio.tests.common import skip_rse_tests_with_accounts
+from .common import skip_rse_tests_with_accounts
 
 
 @pytest.fixture(scope='class')

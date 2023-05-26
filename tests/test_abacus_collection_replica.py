@@ -27,7 +27,7 @@ from rucio.daemons.reaper import reaper
 from rucio.daemons.undertaker import undertaker
 from rucio.db.sqla import models, session
 from rucio.db.sqla.constants import DIDType, ReplicaState
-from rucio.tests.common import did_name_generator
+from .common import did_name_generator
 
 
 @pytest.mark.noparallel(reason='uses daemons, fails when run in parallel')

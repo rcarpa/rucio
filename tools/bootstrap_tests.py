@@ -34,7 +34,7 @@ from rucio.common.utils import extract_scope  # noqa: E402
 from rucio.core.account import add_account_attribute  # noqa: E402
 from rucio.core.vo import map_vo  # noqa: E402
 from rucio.common.types import InternalAccount  # noqa: E402
-from rucio.tests.common_server import reset_config_table  # noqa: E402
+from tests.common_server import reset_config_table  # noqa: E402
 
 
 def belleii_bootstrap(client):

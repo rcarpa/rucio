@@ -34,7 +34,7 @@ from rucio.core.scope import add_scope
 from rucio.core import subscription as subscription_core
 from rucio.daemons.transmogrifier.transmogrifier import run, get_subscriptions
 from rucio.db.sqla.constants import AccountType, DIDType
-from rucio.tests.common import headers, auth, did_name_generator, rse_name_generator
+from .common import headers, auth, did_name_generator, rse_name_generator
 
 
 class TestSubscriptionCoreApi:

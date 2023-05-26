@@ -42,7 +42,7 @@ from rucio.daemons.abacus import rse as abacus_rse
 from rucio.daemons.judge import cleaner
 from rucio.daemons.reaper import reaper
 from rucio.db.sqla import constants
-from rucio.tests.common import rse_name_generator, did_name_generator
+from .common import rse_name_generator, did_name_generator
 
 
 @pytest.fixture(scope='class')

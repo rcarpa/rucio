@@ -35,9 +35,9 @@ from rucio.daemons.judge.repairer import rule_repairer
 from rucio.db.sqla import models
 from rucio.db.sqla.constants import DIDType, RuleState, ReplicaState
 from rucio.db.sqla.session import get_session
-from rucio.tests.common import rse_name_generator, did_name_generator
-from rucio.tests.common_server import get_vo
-from rucio.tests.test_rule import create_files, tag_generator
+from .common import rse_name_generator, did_name_generator
+from .common_server import get_vo
+from .test_rule import create_files, tag_generator
 
 
 @pytest.fixture(scope="class")

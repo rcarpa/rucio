@@ -24,7 +24,7 @@ from rucio.common.dumper.consistency import compare3
 from rucio.common.dumper.consistency import gnu_sort
 from rucio.common.dumper.consistency import min3
 from rucio.common.dumper.consistency import parse_and_filter_file
-from rucio.tests.common import make_temp_file
+from .common import make_temp_file
 
 RSEPROTOCOL = {
     "hostname": "example.com",

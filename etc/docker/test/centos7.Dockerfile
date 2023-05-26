@@ -79,6 +79,7 @@ COPY .flake8 .pep8 .pycodestyle pylintrc setup.py setup_rucio.py setup_rucio_cli
 COPY tools tools
 COPY bin bin
 COPY lib lib
+COPY tests tests
 
 # Install Rucio server + dependencies
 RUN PYEXEC=python ; \
@@ -86,6 +87,6 @@ RUN PYEXEC=python ; \
     $PYEXEC -m pip list
 
 WORKDIR /opt/rucio
-RUN cp -r /usr/local/src/rucio/{lib,bin,tools,etc} ./
+RUN cp -r /usr/local/src/rucio/{lib,bin,tools,etc,tests} ./
 
 CMD ["httpd","-D","FOREGROUND"]

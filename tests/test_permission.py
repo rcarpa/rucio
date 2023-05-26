@@ -20,7 +20,7 @@ from rucio.common.config import config_get
 from rucio.common.types import InternalAccount, InternalScope
 from rucio.core.scope import add_scope
 from rucio.core.account import add_account_attribute, del_account_attribute
-from rucio.tests.common import scope_name_generator
+from .common import scope_name_generator
 
 
 class TestPermissionCoreApi:

@@ -30,8 +30,8 @@ from rucio.daemons.judge.injector import rule_injector
 from rucio.db.sqla.constants import DIDType, RuleState
 from rucio.db.sqla.models import ReplicationRule
 from rucio.db.sqla.session import transactional_session
-from rucio.tests.common_server import get_vo
-from rucio.tests.test_rule import create_files, tag_generator
+from .common_server import get_vo
+from .test_rule import create_files, tag_generator
 
 
 @pytest.fixture(scope="class")

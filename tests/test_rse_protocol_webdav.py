@@ -20,8 +20,8 @@ import requests
 
 from rucio.common.exception import FileReplicaAlreadyExists
 from rucio.rse import rsemanager
-from rucio.tests.common import skip_rse_tests_with_accounts, load_test_conf_file
-from rucio.tests.rsemgr_api_test import MgrTestCases
+from .common import skip_rse_tests_with_accounts, load_test_conf_file
+from .rsemgr_api_test import MgrTestCases
 
 
 @skip_rse_tests_with_accounts
