@@ -33,9 +33,10 @@ from rucio.daemons.reaper.reaper import reaper
 from rucio.db.sqla.models import Request, Source
 from rucio.db.sqla.constants import RequestState
 from rucio.db.sqla.session import read_session, transactional_session
+from tests.ruciopytest import NoParallelGroups
 
 
-@pytest.mark.noparallel(reason="multiple submitters cannot be run in parallel due to partial job assignment by hash")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER])
 @pytest.mark.parametrize("file_config_mock", [
     # Run test twice: with, and without, temp tables
     {
@@ -106,7 +107,7 @@ def test_request_submitted_in_order(rse_factory, did_factory, root_account, file
     assert requests_id_in_submission_order == [r['id'] for r in requests]
 
 
-@pytest.mark.noparallel(reason="multiple submitters cannot be run in parallel due to partial job assignment by hash")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER])
 @pytest.mark.parametrize("core_config_mock", [
     # Run test twice: with, and without, temp tables
     {
@@ -199,7 +200,7 @@ def test_multihop_sources_created(rse_factory, did_factory, root_account, core_c
     assert metrics_mock.get_sample_value('rucio_daemons_conveyor_common_submit_transfer_total') == 1
 
 
-@pytest.mark.noparallel(reason="multiple submitters cannot be run in parallel due to partial job assignment by hash")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True),
 ]}], indirect=True)
@@ -272,7 +273,7 @@ def test_source_avoid_deletion(caches_mock, core_config_mock, rse_factory, did_f
     assert len(replica['pfns']) == 1
 
 
-@pytest.mark.noparallel(reason="multiple submitters cannot be run in parallel due to partial job assignment by hash")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True)
 ]}], indirect=True)
@@ -306,7 +307,7 @@ def test_ignore_availability(rse_factory, did_factory, root_account, core_config
     assert request['transfertool'] == 'mock'
 
 
-@pytest.mark.noparallel(reason="multiple submitters cannot be run in parallel due to partial job assignment by hash")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER])
 def test_globus(rse_factory, did_factory, root_account):
     """
     Test bulk submissions with globus transfertool.
@@ -385,7 +386,7 @@ def test_globus(rse_factory, did_factory, root_account):
     assert request['transfertool'] == 'globus'
 
 
-@pytest.mark.noparallel(reason="multiple submitters cannot be run in parallel due to partial job assignment by hash")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER])
 @pytest.mark.parametrize("file_config_mock", [{"overrides": [
     ('transfers', 'hop_penalty', '5'),
 ]}], indirect=True)

@@ -48,6 +48,7 @@ from rucio.db.sqla.constants import LockState, RequestState, RequestType, Replic
 from rucio.db.sqla.session import read_session, transactional_session
 from .common import skip_rse_tests_with_accounts
 from rucio.transfertool.fts3 import FTS3Transfertool
+from tests.ruciopytest import NoParallelGroups
 
 MAX_POLL_WAIT_SECONDS = 60
 TEST_FTS_HOST = 'https://fts:8446'
@@ -119,7 +120,7 @@ def __get_source(request_id, src_rse_id, scope, name, *, session=None):
 
 @skip_rse_tests_with_accounts
 @pytest.mark.dirty(reason="leaves files in XRD containers")
-@pytest.mark.noparallel(reason="uses predefined RSEs; runs submitter, poller and finisher; changes XRD3 usage and limits")
+@pytest.mark.noparallel(groups=[NoParallelGroups.XRD, NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True),
     ('transfers', 'multihop_tombstone_delay', -1),  # Set OBSOLETE tombstone for intermediate replicas
@@ -245,7 +246,7 @@ def test_multihop_intermediate_replica_lifecycle(vo, did_factory, root_account, 
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="uses predefined RSEs; runs submitter, poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.XRD, NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True),
 ]}], indirect=True)
@@ -298,7 +299,7 @@ def test_fts_non_recoverable_failures_handled_on_multihop(vo, did_factory, root_
 
 @skip_rse_tests_with_accounts
 @pytest.mark.dirty(reason="leaves files in XRD containers")
-@pytest.mark.noparallel(reason="uses predefined RSEs; runs submitter, poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.XRD, NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True),
 ]}], indirect=True)
@@ -350,7 +351,7 @@ def test_fts_recoverable_failures_handled_on_multihop(vo, did_factory, root_acco
 
 @skip_rse_tests_with_accounts
 @pytest.mark.dirty(reason="leaves files in XRD containers")
-@pytest.mark.noparallel(reason="uses predefined RSEs; runs submitter, poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.XRD, NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True),
 ]}], indirect=True)
@@ -423,7 +424,7 @@ def test_multisource(vo, did_factory, root_account, replica_client, core_config_
 
 @skip_rse_tests_with_accounts
 @pytest.mark.dirty(reason="leaves files in XRD containers")
-@pytest.mark.noparallel(reason="uses predefined RSEs; runs submitter and receiver")
+@pytest.mark.noparallel(groups=[NoParallelGroups.XRD, NoParallelGroups.SUBMITTER, NoParallelGroups.RECEIVER])
 def test_multisource_receiver(vo, did_factory, replica_client, root_account, metrics_mock, message_mock):
     """
     Run receiver as a background thread to automatically handle fts notifications.
@@ -495,7 +496,7 @@ def test_multisource_receiver(vo, did_factory, replica_client, root_account, met
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="uses predefined RSEs; runs submitter and receiver")
+@pytest.mark.noparallel(groups=[NoParallelGroups.XRD, NoParallelGroups.SUBMITTER, NoParallelGroups.RECEIVER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True),
 ]}], indirect=True)
@@ -553,7 +554,7 @@ def test_multihop_receiver_on_failure(vo, did_factory, replica_client, root_acco
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="uses predefined RSEs; runs submitter and receiver")
+@pytest.mark.noparallel(groups=[NoParallelGroups.XRD, NoParallelGroups.SUBMITTER, NoParallelGroups.RECEIVER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True),
 ]}], indirect=True)
@@ -601,7 +602,7 @@ def test_multihop_receiver_on_success(vo, did_factory, root_account, core_config
 
 @skip_rse_tests_with_accounts
 @pytest.mark.dirty(reason="leaves files in XRD containers")
-@pytest.mark.noparallel(reason="uses predefined RSEs; runs submitter and receiver")
+@pytest.mark.noparallel(groups=[NoParallelGroups.XRD, NoParallelGroups.SUBMITTER, NoParallelGroups.RECEIVER, NoParallelGroups.POLLER])
 @pytest.mark.parametrize("caches_mock", [{"caches_to_mock": [
     'rucio.core.rse.REGION',
     'rucio.core.rse_expression_parser.REGION',
@@ -669,7 +670,7 @@ def test_receiver_archiving(vo, did_factory, root_account, caches_mock):
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="runs multiple conveyor daemons")
+@pytest.mark.noparallel(groups=[NoParallelGroups.PREPARER, NoParallelGroups.THROTTLER, NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER])
 @pytest.mark.parametrize("file_config_mock", [{
     "overrides": [('conveyor', 'use_preparer', 'true')]
 }], indirect=True)
@@ -762,7 +763,7 @@ def test_preparer_throttler_submitter(rse_factory, did_factory, root_account, fi
 
 @skip_rse_tests_with_accounts
 @pytest.mark.dirty(reason="leaves files in XRD containers")
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.XRD, NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
 @pytest.mark.parametrize("caches_mock", [{"caches_to_mock": [
     'rucio.core.rse.REGION',
     'rucio.rse.rsemanager.RSE_REGION',  # for RSE info
@@ -794,7 +795,7 @@ def test_non_deterministic_dst(did_factory, did_client, root_account, vo, caches
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="runs stager; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.STAGER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
 def test_stager(rse_factory, did_factory, root_account, replica_client):
     """
     Submit a real transfer to FTS and rely on the gfal "mock" plugin to report a simulated "success"
@@ -836,7 +837,7 @@ def test_stager(rse_factory, did_factory, root_account, replica_client):
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER, NoParallelGroups.FINISHER])
 def test_transfer_to_mas_existing_replica(rse_factory, did_factory, root_account):
     """
     Test qos: transfer from tape to disk
@@ -901,7 +902,7 @@ def test_transfer_to_mas_existing_replica(rse_factory, did_factory, root_account
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
 def test_failed_transfers_to_mas_existing_replica(rse_factory, did_factory, root_account):
     """
     Test qos: transfer from tape to disk
@@ -965,7 +966,7 @@ def test_failed_transfers_to_mas_existing_replica(rse_factory, did_factory, root
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
 def test_lost_transfers(rse_factory, did_factory, root_account):
     """
     Correctly handle FTS "404 not found" errors.
@@ -1008,7 +1009,7 @@ def test_lost_transfers(rse_factory, did_factory, root_account):
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER])
 def test_cancel_rule(rse_factory, did_factory, root_account):
     """
     Ensure that, when we cancel a rule, the request is cancelled in FTS
@@ -1135,7 +1136,7 @@ def overwrite_on_tape_topology(rse_factory, did_factory, root_account, vo, file_
 
 @skip_rse_tests_with_accounts
 @pytest.mark.dirty(reason="leaves files in XRD containers")
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True)
 ]}], indirect=True)
@@ -1164,7 +1165,7 @@ def test_overwrite_on_tape(overwrite_on_tape_topology, core_config_mock, caches_
 
 @skip_rse_tests_with_accounts
 @pytest.mark.dirty(reason="leaves files in XRD containers")
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True)
 ]}], indirect=True)
@@ -1216,7 +1217,7 @@ def test_overwrite_hops(overwrite_on_tape_topology, core_config_mock, caches_moc
 
 @skip_rse_tests_with_accounts
 @pytest.mark.dirty(reason="leaves files in XRD containers")
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True)
 ]}], indirect=True)
@@ -1257,7 +1258,7 @@ def test_file_exists_handled(overwrite_on_tape_topology, core_config_mock, cache
 
 @skip_rse_tests_with_accounts
 @pytest.mark.dirty(reason="leaves files in XRD containers; leaves pending fts transfers in archiving state")
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
 @pytest.mark.parametrize("core_config_mock", [{"table_content": [
     ('transfers', 'use_multihop', True),
     ('transfers', 'overwrite_corrupted_files', False)
@@ -1328,7 +1329,7 @@ def test_overwrite_corrupted_files(overwrite_on_tape_topology, core_config_mock,
         assert __wait_for_fts_state(request, expected_state='ARCHIVING') == 'ARCHIVING'
 
 
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER])
 @pytest.mark.parametrize("file_config_mock", [{"overrides": [
     ('conveyor', 'usercert', 'DEFAULT_DUMMY_CERT'),
     ('vo_certs', 'new', 'NEW_VO_DUMMY_CERT'),
@@ -1384,7 +1385,7 @@ def test_multi_vo_certificates(file_config_mock, rse_factory, did_factory, scope
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER, NoParallelGroups.FINISHER])
 @pytest.mark.parametrize("core_config_mock", [
     {"table_content": [
         ('transfers', 'use_multihop', True),
@@ -1500,7 +1501,7 @@ def test_two_multihops_same_intermediate_rse(rse_factory, did_factory, root_acco
 
 
 @skip_rse_tests_with_accounts
-@pytest.mark.noparallel(reason="runs submitter; poller and finisher")
+@pytest.mark.noparallel(groups=[NoParallelGroups.SUBMITTER, NoParallelGroups.POLLER])
 def test_checksum_validation(rse_factory, did_factory, root_account):
     """
     Ensure that the correct checksum validation strategy is applied on submission
@@ -1551,7 +1552,7 @@ def test_checksum_validation(rse_factory, did_factory, root_account):
     assert request['state'] == RequestState.FAILED
 
 
-@pytest.mark.noparallel(reason="runs multiple conveyor daemons")
+@pytest.mark.noparallel(groups=[NoParallelGroups.PREPARER])
 @pytest.mark.parametrize("file_config_mock", [{
     "overrides": [('conveyor', 'use_preparer', 'true')]
 }], indirect=True)

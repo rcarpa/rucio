@@ -51,12 +51,7 @@ if [[ "$NO_XDIST" == "False" ]]; then
   NO_XDIST="$(python -c 'import xdist; print(False)' ||:)"
 fi
 
-if [[ "$NO_XDIST" == "False" ]]; then
-  # do not run xdist below Python 3.6
-  NO_XDIST="$(python -c 'import sys; print(sys.version_info < (3, 6))' ||:)"
-fi
-
-XDIST_ARGS=("-p" "tests.ruciopytest.plugin")
+XDIST_ARGS=()
 if [[ "$NO_XDIST" == "False" ]]; then
   if [[ "${GITHUB_ACTIONS:-false}" == "true" ]]; then
     # run on 3 processes instead of 2 on GitHub Actions
@@ -64,8 +59,8 @@ if [[ "$NO_XDIST" == "False" ]]; then
   else
     PROCESS_COUNT="auto"
   fi
-  XDIST_ARGS=("-p" "xdist" "-p" "tests.ruciopytest.plugin" "--dist=rucio" "--numprocesses=$PROCESS_COUNT")
-  echo "Running pytest with pytest-xdist: ${XDIST_ARGS[@]}"
+  XDIST_ARGS=("-p" "xdist" "--numprocesses=$PROCESS_COUNT")
+  echo "Running pytest with pytest-xdist: " "${XDIST_ARGS[@]}"
 fi
 
-exec python -bb -m pytest -r fExX --log-level=DEBUG ${XDIST_ARGS[@]} ${ARGS[@]}
+exec python -bb -m pytest -r fExX --log-level=DEBUG ${XDIST_ARGS[@]+"${XDIST_ARGS[@]}"} ${ARGS[@]}
