@@ -16,11 +16,9 @@
 """
 Conveyor transfer submitter is a daemon to manage non-tape file transfers.
 """
-
-import functools
 import logging
 import threading
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, List, Mapping, Optional
 
 import rucio.db.sqla.util
 from rucio.common import exception
@@ -34,34 +32,42 @@ from rucio.core.topology import Topology, ExpiringObjectCache
 from rucio.core.transfer import DEFAULT_MULTIHOP_TOMBSTONE_DELAY, list_transfer_admin_accounts, transfer_path_str,\
     TRANSFERTOOL_CLASSES_BY_NAME, ProtocolFactory
 from rucio.daemons.conveyor.common import submit_transfer, get_conveyor_rses, pick_and_prepare_submission_path
-from rucio.daemons.common import run_daemon
+from rucio.daemons.common import db_workqueue, run_in_new_event_loop, ProducerConsumerDaemon
 from rucio.db.sqla.constants import RequestType, RequestState
 from rucio.transfertool.fts3 import FTS3Transfertool
 from rucio.transfertool.globus import GlobusTransferTool
 
 if TYPE_CHECKING:
-    from typing import Dict
+    from rucio.daemons.common import HeartbeatHandler
 
 
 METRICS = MetricManager(module=__name__)
 graceful_stop = threading.Event()
 
-TRANSFER_TOOLS = config_get_list('conveyor', 'transfertool', False, None)  # NOTE: This should eventually be completely removed, as it can be fetched from the request
+TRANSFER_TOOLS = config_get_list('conveyor', 'transfertool', False, [])  # NOTE: This should eventually be completely removed, as it can be fetched from the request
 FILTER_TRANSFERTOOL = config_get('conveyor', 'filter_transfertool', False, None)  # NOTE: TRANSFERTOOL to filter requests on
 TRANSFER_TYPE = config_get('conveyor', 'transfertype', False, 'single')
 
 
-def run_once(bulk, group_bulk, filter_transfertool, transfertools, ignore_availability, rse_ids,
-             scheme, failover_scheme, max_sources, partition_hash_var, timeout, transfertool_kwargs,
-             heartbeat_handler, activity, request_type, metrics, cached_topology):
+def _fetch_requests(
+        partition_hash_var: Optional[str],
+        bulk: int,
+        activity: str,
+        rse_ids: Optional[List[str]],
+        request_type: List[RequestType],
+        ignore_availability: bool,
+        filter_transfertool: Optional[str],
+        metrics: MetricManager,
+        cached_topology,
+        heartbeat_handler: "HeartbeatHandler",
+):
+    """
+    Fetches requests to be handled from the database
+    """
     worker_number, total_workers, logger = heartbeat_handler.live()
 
     topology = cached_topology.get() if cached_topology else Topology(ignore_availability=ignore_availability)
     topology.configure_multihop(logger=logger)
-    protocol_factory = ProtocolFactory()
-    default_tombstone_delay = config_get_int('transfers', 'multihop_tombstone_delay', default=DEFAULT_MULTIHOP_TOMBSTONE_DELAY, expiration_time=600)
-
-    admin_accounts = list_transfer_admin_accounts()
     stopwatch = Stopwatch()
 
     required_source_rse_attrs = None
@@ -87,6 +93,38 @@ def run_once(bulk, group_bulk, filter_transfertool, transfertools, ignore_availa
         transfertool=filter_transfertool,
         required_source_rse_attrs=required_source_rse_attrs,
     )
+    stopwatch.stop()
+    total_transfers = len(requests_with_sources)
+
+    metrics.timer('get_transfers.time_per_transfer').observe(stopwatch.elapsed / (total_transfers or 1))
+    metrics.counter('get_transfers.total_transfers').inc(total_transfers)
+    logger(logging.INFO, 'Got %s transfers for %s in %s seconds', total_transfers, activity, stopwatch.elapsed)
+
+    must_sleep = False
+    if total_transfers < bulk:
+        must_sleep = True
+        logger(logging.DEBUG, 'Only %s transfers for %s which is less than bulk %s', total_transfers, activity, bulk)
+
+    return must_sleep, (topology, requests_with_sources)
+
+
+def _prepare_paths_and_submit(
+        batch,
+        *,
+        transfertools: List[str],
+        schemes: Optional[List[str]],
+        failover_schemes: Optional[List[str]],
+        max_sources: int,
+        timeout: Optional[float],
+        transfertool_kwargs,
+        metrics: MetricManager,
+        logger,
+):
+    topology, requests_with_sources = batch
+
+    protocol_factory = ProtocolFactory()
+    default_tombstone_delay = config_get_int('transfers', 'multihop_tombstone_delay', default=DEFAULT_MULTIHOP_TOMBSTONE_DELAY, expiration_time=600)
+    admin_accounts = list_transfer_admin_accounts()
 
     transfers = pick_and_prepare_submission_path(
         requests_with_sources=requests_with_sources,
@@ -94,19 +132,12 @@ def run_once(bulk, group_bulk, filter_transfertool, transfertools, ignore_availa
         protocol_factory=protocol_factory,
         default_tombstone_delay=default_tombstone_delay,
         admin_accounts=admin_accounts,
-        failover_schemes=failover_scheme,
-        schemes=scheme,
+        failover_schemes=failover_schemes,
+        schemes=schemes,
         max_sources=max_sources,
         transfertools=transfertools,
         logger=logger,
     )
-
-    stopwatch.stop()
-    total_transfers = len(list(hop for paths in transfers.values() for path in paths for hop in path))
-
-    metrics.timer('get_transfers.time_per_transfer').observe(stopwatch.elapsed / (total_transfers or 1))
-    metrics.counter('get_transfers.total_transfers').inc(total_transfers)
-    logger(logging.INFO, 'Got %s transfers for %s in %s seconds', total_transfers, activity, stopwatch.elapsed)
 
     for builder, transfer_paths in transfers.items():
         # Globus Transfertool is not yet production-ready, but we need to partially activate it
@@ -123,26 +154,19 @@ def run_once(bulk, group_bulk, filter_transfertool, transfertools, ignore_availa
             continue
 
         transfertool_obj = builder.make_transfertool(logger=logger, **transfertool_kwargs.get(builder.transfertool_class, {}))
-        logger(logging.DEBUG, 'Starting to group transfers for %s (%s)', activity, transfertool_obj)
-        stopwatch.restart()
+        logger(logging.DEBUG, 'Starting to group transfers %s', transfertool_obj)
+        stopwatch = Stopwatch()
         grouped_jobs = transfertool_obj.group_into_submit_jobs(transfer_paths)
         metrics.timer('bulk_group_transfer').observe(stopwatch.elapsed / (len(transfer_paths) or 1))
 
-        logger(logging.DEBUG, 'Starting to submit transfers for %s (%s)', activity, transfertool_obj)
+        logger(logging.DEBUG, 'Starting to submit transfers for %s', transfertool_obj)
         for job in grouped_jobs:
-            worker_number, total_workers, logger = heartbeat_handler.live()
             logger(logging.DEBUG, 'submitjob: transfers=%s, job_params=%s' % ([str(t) for t in job['transfers']], job['job_params']))
             submit_transfer(transfertool_obj=transfertool_obj, transfers=job['transfers'], job_params=job['job_params'],
                             timeout=timeout, logger=logger)
 
-    queue_empty = False
-    if total_transfers < group_bulk:
-        queue_empty = True
-        logger(logging.DEBUG, 'Only %s transfers for %s which is less than group bulk %s', total_transfers, activity, group_bulk)
-    return queue_empty
 
-
-def _get_max_time_in_queue_conf() -> "Dict[str, int]":
+def _get_max_time_in_queue_conf() -> Dict[str, int]:
     """
     Retrieve and parse the max_time_in_queue configuration value into a dictionary: {"activity": int}
     """
@@ -158,13 +182,33 @@ def _get_max_time_in_queue_conf() -> "Dict[str, int]":
     return max_time_in_queue
 
 
-def submitter(once=False, rses=None, partition_wait_time=10,
-              bulk=100, group_bulk=1, group_policy='rule', source_strategy=None,
-              activities=None, sleep_time=600, max_sources=4, archive_timeout_override=None,
-              filter_transfertool=FILTER_TRANSFERTOOL, transfertools=TRANSFER_TOOLS,
-              transfertype=TRANSFER_TYPE, ignore_availability=False,
-              executable='conveyor-submitter', request_type=None, default_lifetime=172800, metrics=METRICS,
-              cached_topology=None):
+def submitter(*args, **kwargs):
+    return run_in_new_event_loop(_submitter(*args, **kwargs))
+
+
+async def _submitter(
+        once: bool = False,
+        rses: Optional[List[Mapping[str, Any]]] = None,
+        partition_wait_time: int = 10,
+        bulk: int = 100,
+        group_bulk: int = 1,
+        group_policy: str = 'rule',
+        source_strategy: Optional[str] = None,
+        activities: Optional[List[str]] = None,
+        sleep_time: int = 600,
+        max_sources: int = 4,
+        archive_timeout_override: Optional[int] = None,
+        filter_transfertool: Optional[str] = FILTER_TRANSFERTOOL,
+        transfertools: List[str] = TRANSFER_TOOLS,
+        transfertype: str = TRANSFER_TYPE,
+        ignore_availability: bool = False,
+        executable: str = 'conveyor-submitter',
+        request_type: Optional[List[RequestType]] = None,
+        default_lifetime: int = 172800,
+        metrics: MetricManager = METRICS,
+        cached_topology=None,
+        total_threads: int = 1,
+):
     """
     Main loop to submit a new transfer primitive to a transfertool.
     """
@@ -174,8 +218,8 @@ def submitter(once=False, rses=None, partition_wait_time=10,
 
     partition_hash_var = config_get('conveyor', 'partition_hash_var', default=None, raise_exception=False)
 
-    scheme = config_get('conveyor', 'scheme', default=None, raise_exception=False)
-    failover_scheme = config_get('conveyor', 'failover_scheme', default=None, raise_exception=False)
+    schemes = config_get_list('conveyor', 'scheme', default=None, raise_exception=False)
+    failover_schemes = config_get_list('conveyor', 'failover_scheme', default=None, raise_exception=False)
 
     timeout = config_get_float('conveyor', 'submit_timeout', default=None, raise_exception=False)
 
@@ -211,33 +255,45 @@ def submitter(once=False, rses=None, partition_wait_time=10,
         },
     }
 
-    run_daemon(
+    @db_workqueue(
         once=once,
         graceful_stop=graceful_stop,
         executable=executable,
         logger_prefix=logger_prefix,
         partition_wait_time=partition_wait_time,
-        sleep_time=sleep_time,
-        run_once_fnc=functools.partial(
-            run_once,
+        sleep_time=sleep_time)
+    async def _db_producer(*, activity, heartbeat_handler):
+        return _fetch_requests(
             bulk=bulk,
-            group_bulk=group_bulk,
             filter_transfertool=filter_transfertool,
-            transfertools=transfertools,
             ignore_availability=ignore_availability,
-            scheme=scheme,
-            failover_scheme=failover_scheme,
-            max_sources=max_sources,
             partition_hash_var=partition_hash_var,
             rse_ids=rse_ids,
-            timeout=timeout,
-            transfertool_kwargs=transfertool_kwargs,
             request_type=request_type,
             metrics=metrics,
+            activity=activity,
+            heartbeat_handler=heartbeat_handler,
             cached_topology=cached_topology,
-        ),
-        activities=activities,
-    )
+        )
+
+    async def _consumer(batch):
+        return _prepare_paths_and_submit(
+            batch,
+            transfertools=transfertools,
+            schemes=schemes,
+            failover_schemes=failover_schemes,
+            max_sources=max_sources,
+            timeout=timeout,
+            transfertool_kwargs=transfertool_kwargs,
+            metrics=metrics,
+            logger=logging.log,
+        )
+
+    await ProducerConsumerDaemon(
+        producers=[_db_producer for _ in range(total_threads)],
+        consumers=[_consumer for _ in range(total_threads)],
+        multithreaded=total_threads > 1,
+    ).run()
 
 
 def stop(signum=None, frame=None):
@@ -290,23 +346,18 @@ def run(once=False, group_bulk=1, group_policy='rule',
                 activities.remove(activity)
 
     cached_topology = ExpiringObjectCache(ttl=300, new_obj_fnc=lambda: Topology(ignore_availability=ignore_availability))
-    threads = [threading.Thread(target=submitter, kwargs={'once': once,
-                                                          'rses': working_rses,
-                                                          'bulk': bulk,
-                                                          'group_bulk': group_bulk,
-                                                          'group_policy': group_policy,
-                                                          'activities': activities,
-                                                          'ignore_availability': ignore_availability,
-                                                          'sleep_time': sleep_time,
-                                                          'max_sources': max_sources,
-                                                          'source_strategy': source_strategy,
-                                                          'archive_timeout_override': archive_timeout_override,
-                                                          'cached_topology': cached_topology}) for _ in range(0, total_threads)]
-
-    [thread.start() for thread in threads]
-
-    logging.info('waiting for interrupts')
-
-    # Interruptible joins require a timeout.
-    while threads:
-        threads = [thread.join(timeout=3.14) for thread in threads if thread and thread.is_alive()]
+    submitter(
+        once=once,
+        rses=working_rses,
+        bulk=bulk,
+        group_bulk=group_bulk,
+        group_policy=group_policy,
+        activities=activities,
+        ignore_availability=ignore_availability,
+        sleep_time=sleep_time,
+        max_sources=max_sources,
+        source_strategy=source_strategy,
+        archive_timeout_override=archive_timeout_override,
+        cached_topology=cached_topology,
+        total_threads=total_threads,
+    )
