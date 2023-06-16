@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING, cast, Any, Callable, Generic, Iterable, Iterat
 from sqlalchemy import and_, select
 
 from rucio.common.utils import PriorityQueue
-from rucio.common.config import config_get_int, config_get
+from rucio.common.config import config_get_int, config_get, config_get_bool
 from rucio.common.exception import NoDistance, RSEProtocolNotSupported, InvalidRSEExpression
 from rucio.core.rse import RseCollection, RseData
 from rucio.core.rse_expression_parser import parse_expression
@@ -156,7 +156,7 @@ class Topology(RseCollection, Generic[TN, TE]):
     def configure_multihop(self, multihop_rse_ids: Optional[Set[str]] = None, *, session: "Session", logger: LoggerFunction = logging.log):
 
         if multihop_rse_ids is None:
-            include_multihop = config_get('transfers', 'use_multihop', default=False, expiration_time=600, session=session)
+            include_multihop = config_get_bool('transfers', 'use_multihop', default=False, expiration_time=600, session=session)
             multihop_rse_expression = config_get('transfers', 'multihop_rse_expression', default='available_for_multihop=true', expiration_time=600, session=session)
 
             multihop_rse_ids = set()

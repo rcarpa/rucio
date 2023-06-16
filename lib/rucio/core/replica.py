@@ -1905,7 +1905,7 @@ def __cleanup_after_replica_deletion(scope_name_temp_table, scope_name_temp_tabl
             parents_to_analyze.add(ScopeName(scope=parent_scope, name=parent_name))
 
             # 3) Schedule removal of the entry from the DIDs table
-            remove_open_did = config_get('reaper', 'remove_open_did', default=False, session=session)
+            remove_open_did = config_get_bool('reaper', 'remove_open_did', default=False, session=session)
             if remove_open_did:
                 did_condition.append(
                     and_(models.DataIdentifier.scope == parent_scope,
@@ -2434,7 +2434,7 @@ def __cleanup_after_replica_deletion_without_temp_table(rse_id, files, *, sessio
                                   models.DataIdentifierAssociation.name == parent_name))))
 
                 # 3) Schedule removal of the entry from the DIDs table
-                remove_open_did = config_get('reaper', 'remove_open_did', default=False, session=session)
+                remove_open_did = config_get_bool('reaper', 'remove_open_did', default=False, session=session)
                 if remove_open_did:
                     did_condition.append(
                         and_(models.DataIdentifier.scope == parent_scope,
