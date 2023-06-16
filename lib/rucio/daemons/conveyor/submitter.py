@@ -32,7 +32,7 @@ from rucio.core.topology import Topology, ExpiringObjectCache
 from rucio.core.transfer import DEFAULT_MULTIHOP_TOMBSTONE_DELAY, list_transfer_admin_accounts, transfer_path_str,\
     TRANSFERTOOL_CLASSES_BY_NAME, ProtocolFactory
 from rucio.daemons.conveyor.common import submit_transfer, get_conveyor_rses, pick_and_prepare_submission_path
-from rucio.daemons.common import db_workqueue, run_in_new_event_loop, ProducerConsumerDaemon
+from rucio.daemons.common import db_workqueue, ProducerConsumerDaemon
 from rucio.db.sqla.constants import RequestType, RequestState
 from rucio.transfertool.fts3 import FTS3Transfertool
 from rucio.transfertool.globus import GlobusTransferTool
@@ -182,11 +182,7 @@ def _get_max_time_in_queue_conf() -> Dict[str, int]:
     return max_time_in_queue
 
 
-def submitter(*args, **kwargs):
-    return run_in_new_event_loop(_submitter(*args, **kwargs))
-
-
-async def _submitter(
+def submitter(
         once: bool = False,
         rses: Optional[List[Mapping[str, Any]]] = None,
         partition_wait_time: int = 10,
@@ -262,7 +258,7 @@ async def _submitter(
         logger_prefix=logger_prefix,
         partition_wait_time=partition_wait_time,
         sleep_time=sleep_time)
-    async def _db_producer(*, activity, heartbeat_handler):
+    def _db_producer(*, activity, heartbeat_handler):
         return _fetch_requests(
             bulk=bulk,
             filter_transfertool=filter_transfertool,
@@ -276,7 +272,7 @@ async def _submitter(
             cached_topology=cached_topology,
         )
 
-    async def _consumer(batch):
+    def _consumer(batch):
         return _prepare_paths_and_submit(
             batch,
             transfertools=transfertools,
@@ -289,10 +285,9 @@ async def _submitter(
             logger=logging.log,
         )
 
-    await ProducerConsumerDaemon(
+    ProducerConsumerDaemon(
         producers=[_db_producer for _ in range(total_threads)],
         consumers=[_consumer for _ in range(total_threads)],
-        multithreaded=total_threads > 1,
     ).run()
 
 
