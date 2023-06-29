@@ -30,7 +30,7 @@ from rucio.common.schema import get_schema_value
 from rucio.common.stopwatch import Stopwatch
 from rucio.core.monitor import MetricManager
 from rucio.core.request import list_transfer_requests_and_source_replicas
-from rucio.core.topology import Topology
+from rucio.core.topology import Topology, ExpiringObjectCache
 from rucio.core.transfer import DEFAULT_MULTIHOP_TOMBSTONE_DELAY, list_transfer_admin_accounts, transfer_path_str,\
     TRANSFERTOOL_CLASSES_BY_NAME, ProtocolFactory
 from rucio.daemons.conveyor.common import submit_transfer, get_conveyor_rses, pick_and_prepare_submission_path
@@ -53,10 +53,11 @@ TRANSFER_TYPE = config_get('conveyor', 'transfertype', False, 'single')
 
 def run_once(bulk, group_bulk, filter_transfertool, transfertools, ignore_availability, rse_ids,
              scheme, failover_scheme, max_sources, partition_hash_var, timeout, transfertool_kwargs,
-             heartbeat_handler, activity, request_type, metrics):
+             heartbeat_handler, activity, request_type, metrics, cached_topology):
     worker_number, total_workers, logger = heartbeat_handler.live()
 
-    topology = Topology(ignore_availability=ignore_availability).configure_multihop(logger=logger)
+    topology = cached_topology.get() if cached_topology else Topology(ignore_availability=ignore_availability)
+    topology.configure_multihop(logger=logger)
     protocol_factory = ProtocolFactory()
     default_tombstone_delay = config_get_int('transfers', 'multihop_tombstone_delay', default=DEFAULT_MULTIHOP_TOMBSTONE_DELAY, expiration_time=600)
 
@@ -162,7 +163,8 @@ def submitter(once=False, rses=None, partition_wait_time=10,
               activities=None, sleep_time=600, max_sources=4, archive_timeout_override=None,
               filter_transfertool=FILTER_TRANSFERTOOL, transfertools=TRANSFER_TOOLS,
               transfertype=TRANSFER_TYPE, ignore_availability=False,
-              executable='conveyor-submitter', request_type=None, default_lifetime=172800, metrics=METRICS):
+              executable='conveyor-submitter', request_type=None, default_lifetime=172800, metrics=METRICS,
+              cached_topology=None):
     """
     Main loop to submit a new transfer primitive to a transfertool.
     """
@@ -232,6 +234,7 @@ def submitter(once=False, rses=None, partition_wait_time=10,
             transfertool_kwargs=transfertool_kwargs,
             request_type=request_type,
             metrics=metrics,
+            cached_topology=cached_topology,
         ),
         activities=activities,
     )
@@ -286,6 +289,7 @@ def run(once=False, group_bulk=1, group_policy='rule',
             if activity in activities:
                 activities.remove(activity)
 
+    cached_topology = ExpiringObjectCache(ttl=300, new_obj_fnc=lambda: Topology(ignore_availability=ignore_availability))
     threads = [threading.Thread(target=submitter, kwargs={'once': once,
                                                           'rses': working_rses,
                                                           'bulk': bulk,
@@ -296,7 +300,8 @@ def run(once=False, group_bulk=1, group_policy='rule',
                                                           'sleep_time': sleep_time,
                                                           'max_sources': max_sources,
                                                           'source_strategy': source_strategy,
-                                                          'archive_timeout_override': archive_timeout_override}) for _ in range(0, total_threads)]
+                                                          'archive_timeout_override': archive_timeout_override,
+                                                          'cached_topology': cached_topology}) for _ in range(0, total_threads)]
 
     [thread.start() for thread in threads]
 
