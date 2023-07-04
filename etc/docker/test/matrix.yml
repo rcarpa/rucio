@@ -1,36 +1,10 @@
 dists:
-  - id: centos7
-    allow:
-      python:
-        - "3.6"
-    deny:
-      suites:
-        - sqlite
-        - py37py38
-  - id: alma8
-    allow:
-      python:
-        - "3.7"
-        - "3.8"
   - id: alma9
     allow:
       python:
         - "3.9"
         - "3.10"
 python:
-  - id: "3.6"
-  - id: "3.7"
-    allow:
-      suites:
-        - py37py38
-        - client
-        - client_syntax
-  - id: "3.8"
-    allow:
-      suites:
-        - py37py38
-        - client
-        - client_syntax
   - id: "3.9"
     allow:
       suites:
@@ -72,7 +46,5 @@ suites:
   - id: multi_vo
     RDBMS: postgres14
     RUCIO_HOME: /opt/rucio/etc/multi_vo/tst
-  - id: py37py38
-    RDBMS: postgres14
 image_identifier:
   - autotest
