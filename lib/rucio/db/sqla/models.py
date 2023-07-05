@@ -292,8 +292,8 @@ class Account(BASE, ModelBase):
                                                        values_callable=lambda obj: [e.value for e in obj]),
                                                   default=AccountStatus.ACTIVE, )
     email: Mapped[Optional[str]] = mapped_column(String(255))
-    suspended_at: Mapped[datetime] = mapped_column(DateTime)
-    deleted_at: Mapped[datetime] = mapped_column(DateTime)
+    suspended_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('account', name='ACCOUNTS_PK'),
                    CheckConstraint('ACCOUNT_TYPE IS NOT NULL', name='ACCOUNTS_TYPE_NN'),
                    CheckConstraint('STATUS IS NOT NULL', name='ACCOUNTS_STATUS_NN'))
@@ -354,8 +354,8 @@ class Scope(BASE, ModelBase):
                                                      create_constraint=True,
                                                      values_callable=lambda obj: [e.value for e in obj]),
                                                 default=ScopeStatus.OPEN)
-    closed_at: Mapped[datetime] = mapped_column(DateTime)
-    deleted_at: Mapped[datetime] = mapped_column(DateTime)
+    closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('scope', name='SCOPES_SCOPE_PK'),
                    ForeignKeyConstraint(['account'], ['accounts.account'], name='SCOPES_ACCOUNT_FK'),
                    CheckConstraint('is_default IS NOT NULL', name='SCOPES_IS_DEFAULT_NN'),
@@ -393,10 +393,10 @@ class DataIdentifier(BASE, ModelBase):
     length: Mapped[Optional[int]] = mapped_column(BigInteger)
     md5: Mapped[Optional[str]] = mapped_column(String(32))
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
-    expired_at: Mapped[datetime] = mapped_column(DateTime)
+    expired_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     purge_replicas: Mapped[bool] = mapped_column(Boolean(name='DIDS_PURGE_RPLCS_CHK', create_constraint=True),
                                                  server_default='1')
-    deleted_at: Mapped[datetime] = mapped_column(DateTime)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     # hardcoded meta-data to populate the db
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
     guid: Mapped[uuid.UUID] = mapped_column(GUID())
@@ -414,9 +414,9 @@ class DataIdentifier(BASE, ModelBase):
     phys_group: Mapped[Optional[str]] = mapped_column(String(25))
     transient: Mapped[bool] = mapped_column(Boolean(name='DID_TRANSIENT_CHK', create_constraint=True),
                                             server_default='0')
-    accessed_at: Mapped[datetime] = mapped_column(DateTime)
-    closed_at: Mapped[datetime] = mapped_column(DateTime)
-    eol_at: Mapped[datetime] = mapped_column(DateTime)
+    accessed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    eol_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     is_archive: Mapped[bool] = mapped_column(Boolean(name='DIDS_ARCHIVE_CHK', create_constraint=True))
     constituent: Mapped[bool] = mapped_column(Boolean(name='DIDS_CONSTITUENT_CHK', create_constraint=True))
     access_cnt: Mapped[Optional[int]] = mapped_column(Integer())
@@ -485,8 +485,8 @@ class DeletedDataIdentifier(BASE, ModelBase):
     length: Mapped[Optional[int]] = mapped_column(BigInteger)
     md5: Mapped[Optional[str]] = mapped_column(String(32))
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
-    expired_at: Mapped[datetime] = mapped_column(DateTime)
-    deleted_at: Mapped[datetime] = mapped_column(DateTime)
+    expired_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
     guid: Mapped[uuid.UUID] = mapped_column(GUID())
     project: Mapped[Optional[str]] = mapped_column(String(50))
@@ -504,9 +504,9 @@ class DeletedDataIdentifier(BASE, ModelBase):
     transient: Mapped[bool] = mapped_column(Boolean(name='DEL_DID_TRANSIENT_CHK', create_constraint=True),
                                             server_default='0')
     purge_replicas: Mapped[bool] = mapped_column(Boolean(name='DELETED_DIDS_PURGE_RPLCS_CHK', create_constraint=True))
-    accessed_at: Mapped[datetime] = mapped_column(DateTime)
-    closed_at: Mapped[datetime] = mapped_column(DateTime)
-    eol_at: Mapped[datetime] = mapped_column(DateTime)
+    accessed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    eol_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     is_archive: Mapped[bool] = mapped_column(Boolean(name='DEL_DIDS_ARCH_CHK', create_constraint=True))
     constituent: Mapped[bool] = mapped_column(Boolean(name='DEL_DIDS_CONST_CHK', create_constraint=True))
     access_cnt: Mapped[Optional[int]] = mapped_column(Integer())
@@ -541,7 +541,7 @@ class BadReplicas(BASE, ModelBase):
                                                   default=BadFilesStatus.SUSPICIOUS)
     account: Mapped[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     bytes: Mapped[Optional[int]] = mapped_column(BigInteger)
-    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('scope', 'name', 'rse_id', 'state', 'created_at', name='BAD_REPLICAS_STATE_PK'),
                    CheckConstraint('SCOPE IS NOT NULL', name='BAD_REPLICAS_SCOPE_NN'),
                    CheckConstraint('NAME IS NOT NULL', name='BAD_REPLICAS_NAME_NN'),
@@ -562,7 +562,7 @@ class BadPFNs(BASE, ModelBase):
                                                 default=BadPFNStatus.SUSPICIOUS)
     reason: Mapped[Optional[str]] = mapped_column(String(255))
     account: Mapped[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
-    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('path', 'state', name='BAD_PFNS_PK'),
                    ForeignKeyConstraint(['account'], ['accounts.account'], name='BAD_PFNS_ACCOUNT_FK'))
 
@@ -592,7 +592,7 @@ class QuarantinedReplicaHistory(BASE, ModelBase):
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
     scope: Mapped[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapped[Optional[str]] = mapped_column(String(get_schema_value('NAME_LENGTH')))
-    deleted_at: Mapped[datetime] = mapped_column(DateTime)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     __mapper_args__ = {
         'primary_key': [rse_id, path]  # Fake primary key for SQLA
     }
@@ -712,8 +712,8 @@ class DataIdentifierAssociationHistory(BASE, ModelBase):
     guid: Mapped[uuid.UUID] = mapped_column(GUID())
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
     rule_evaluation: Mapped[bool] = mapped_column(Boolean(name='CONTENTS_HIST_RULE_EVAL_CHK', create_constraint=True))
-    did_created_at: Mapped[datetime] = mapped_column(DateTime)
-    deleted_at: Mapped[datetime] = mapped_column(DateTime)
+    did_created_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     __mapper_args__ = {
         'primary_key': [scope, name, child_scope, child_name]  # Fake primary key for SQLA
     }
@@ -938,8 +938,8 @@ class RSEFileAssociation(BASE, ModelBase):
                                                      values_callable=lambda obj: [e.value for e in obj]),
                                                 default=ReplicaState.UNAVAILABLE)
     lock_cnt: Mapped[int] = mapped_column(Integer, server_default='0')
-    accessed_at: Mapped[datetime] = mapped_column(DateTime)
-    tombstone: Mapped[datetime] = mapped_column(DateTime)
+    accessed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    tombstone: Mapped[Optional[datetime]] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('scope', 'name', 'rse_id', name='REPLICAS_PK'),
                    ForeignKeyConstraint(['scope', 'name'], ['dids.scope', 'dids.name'], name='REPLICAS_LFN_FK'),
                    ForeignKeyConstraint(['rse_id'], ['rses.id'], name='REPLICAS_RSE_ID_FK'),
@@ -970,7 +970,7 @@ class CollectionReplica(BASE, ModelBase):
                                                      create_constraint=True,
                                                      values_callable=lambda obj: [e.value for e in obj]),
                                                 default=ReplicaState.UNAVAILABLE)
-    accessed_at: Mapped[datetime] = mapped_column(DateTime)
+    accessed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('scope', 'name', 'rse_id', name='COLLECTION_REPLICAS_PK'),
                    ForeignKeyConstraint(['scope', 'name'], ['dids.scope', 'dids.name'], name='COLLECTION_REPLICAS_LFN_FK'),
                    ForeignKeyConstraint(['rse_id'], ['rses.id'], name='COLLECTION_REPLICAS_RSE_ID_FK'),
@@ -1025,7 +1025,7 @@ class ReplicationRule(BASE, ModelBase):
     error: Mapped[Optional[str]] = mapped_column(String(255))
     rse_expression: Mapped[str] = mapped_column(String(3000))
     copies: Mapped[int] = mapped_column(SmallInteger, server_default='1')
-    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     weight: Mapped[Optional[str]] = mapped_column(String(255))
     locked: Mapped[bool] = mapped_column(Boolean(name='RULES_LOCKED_CHK', create_constraint=True),
                                          default=False)
@@ -1042,7 +1042,7 @@ class ReplicationRule(BASE, ModelBase):
                                                                 create_constraint=True,
                                                                 values_callable=lambda obj: [e.value for e in obj]),
                                                            default=RuleNotification.NO)
-    stuck_at: Mapped[datetime] = mapped_column(DateTime)
+    stuck_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     purge_replicas: Mapped[bool] = mapped_column(Boolean(name='RULES_PURGE_REPLICAS_CHK', create_constraint=True),
                                                  default=False)
     ignore_availability: Mapped[bool] = mapped_column(Boolean(name='RULES_IGNORE_AVAILABILITY_CHK', create_constraint=True),
@@ -1052,7 +1052,7 @@ class ReplicationRule(BASE, ModelBase):
     priority: Mapped[Optional[int]] = mapped_column(Integer)
     comments: Mapped[Optional[str]] = mapped_column(String(255))
     child_rule_id: Mapped[uuid.UUID] = mapped_column(GUID())
-    eol_at: Mapped[datetime] = mapped_column(DateTime)
+    eol_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     split_container: Mapped[bool] = mapped_column(Boolean(name='RULES_SPLIT_CONTAINER_CHK', create_constraint=True),
                                                   default=False)
     meta: Mapped[Optional[str]] = mapped_column(String(4000))
@@ -1097,7 +1097,7 @@ class ReplicationRuleHistoryRecent(BASE, ModelBase):
     error: Mapped[Optional[str]] = mapped_column(String(255))
     rse_expression: Mapped[str] = mapped_column(String(3000))
     copies: Mapped[Optional[int]] = mapped_column(SmallInteger)
-    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     weight: Mapped[Optional[str]] = mapped_column(String(255))
     locked: Mapped[bool] = mapped_column(Boolean())
     locks_ok_cnt: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -1111,14 +1111,14 @@ class ReplicationRuleHistoryRecent(BASE, ModelBase):
     notification: Mapped[RuleNotification] = mapped_column(Enum(RuleNotification, name='RULES_HIST_RECENT_NOTIFY_CHK',
                                                                 create_constraint=True,
                                                                 values_callable=lambda obj: [e.value for e in obj]))
-    stuck_at: Mapped[datetime] = mapped_column(DateTime)
+    stuck_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     purge_replicas: Mapped[bool] = mapped_column(Boolean())
     ignore_availability: Mapped[bool] = mapped_column(Boolean())
     ignore_account_limit: Mapped[bool] = mapped_column(Boolean())
     priority: Mapped[Optional[int]] = mapped_column(Integer)
     comments: Mapped[Optional[str]] = mapped_column(String(255))
     child_rule_id: Mapped[uuid.UUID] = mapped_column(GUID())
-    eol_at: Mapped[datetime] = mapped_column(DateTime)
+    eol_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     split_container: Mapped[bool] = mapped_column(Boolean())
     meta: Mapped[Optional[str]] = mapped_column(String(4000))
     __mapper_args__ = {
@@ -1145,7 +1145,7 @@ class ReplicationRuleHistory(BASE, ModelBase):
     error: Mapped[Optional[str]] = mapped_column(String(255))
     rse_expression: Mapped[str] = mapped_column(String(3000))
     copies: Mapped[Optional[int]] = mapped_column(SmallInteger)
-    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     weight: Mapped[Optional[str]] = mapped_column(String(255))
     locked: Mapped[bool] = mapped_column(Boolean())
     locks_ok_cnt: Mapped[Optional[int]] = mapped_column(BigInteger)
@@ -1159,14 +1159,14 @@ class ReplicationRuleHistory(BASE, ModelBase):
     notification: Mapped[RuleNotification] = mapped_column(Enum(RuleNotification, name='RULES_HISTORY_NOTIFY_CHK',
                                                                 create_constraint=True,
                                                                 values_callable=lambda obj: [e.value for e in obj]))
-    stuck_at: Mapped[datetime] = mapped_column(DateTime)
+    stuck_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     priority: Mapped[Optional[int]] = mapped_column(Integer)
     purge_replicas: Mapped[bool] = mapped_column(Boolean())
     ignore_availability: Mapped[bool] = mapped_column(Boolean())
     ignore_account_limit: Mapped[bool] = mapped_column(Boolean())
     comments: Mapped[Optional[str]] = mapped_column(String(255))
     child_rule_id: Mapped[uuid.UUID] = mapped_column(GUID())
-    eol_at: Mapped[datetime] = mapped_column(DateTime)
+    eol_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     split_container: Mapped[bool] = mapped_column(Boolean())
     meta: Mapped[Optional[str]] = mapped_column(String(4000))
     __mapper_args__ = {
@@ -1211,7 +1211,7 @@ class DatasetLock(BASE, ModelBase):
                                              default=LockState.REPLICATING)
     length: Mapped[Optional[int]] = mapped_column(BigInteger)
     bytes: Mapped[Optional[int]] = mapped_column(BigInteger)
-    accessed_at: Mapped[datetime] = mapped_column(DateTime)
+    accessed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('scope', 'name', 'rule_id', 'rse_id', name='DATASET_LOCKS_PK'),
                    ForeignKeyConstraint(['scope', 'name'], ['dids.scope', 'dids.name'], name='DATASET_LOCKS_DID_FK'),
                    ForeignKeyConstraint(['rule_id'], ['rules.id'], name='DATASET_LOCKS_RULE_ID_FK'),
@@ -1268,17 +1268,17 @@ class Request(BASE, ModelBase):
     md5: Mapped[Optional[str]] = mapped_column(String(32))
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
     dest_url: Mapped[Optional[str]] = mapped_column(String(2048))
-    submitted_at: Mapped[datetime] = mapped_column(DateTime)
-    started_at: Mapped[datetime] = mapped_column(DateTime)
-    transferred_at: Mapped[datetime] = mapped_column(DateTime)
-    estimated_at: Mapped[datetime] = mapped_column(DateTime)
+    submitted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    transferred_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    estimated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     submitter_id: Mapped[Optional[int]] = mapped_column(Integer)
-    estimated_started_at: Mapped[datetime] = mapped_column(DateTime)
-    estimated_transferred_at: Mapped[datetime] = mapped_column(DateTime)
-    staging_started_at: Mapped[datetime] = mapped_column(DateTime)
-    staging_finished_at: Mapped[datetime] = mapped_column(DateTime)
+    estimated_started_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    estimated_transferred_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    staging_started_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    staging_finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     account: Mapped[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
-    requested_at: Mapped[datetime] = mapped_column(DateTime)
+    requested_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     priority: Mapped[Optional[int]] = mapped_column(Integer)
     transfertool: Mapped[Optional[str]] = mapped_column(String(64))
     _table_args = (PrimaryKeyConstraint('id', name='REQUESTS_PK'),
@@ -1341,17 +1341,17 @@ class RequestHistory(BASE, ModelBase):
     md5: Mapped[Optional[str]] = mapped_column(String(32))
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
     dest_url: Mapped[Optional[str]] = mapped_column(String(2048))
-    submitted_at: Mapped[datetime] = mapped_column(DateTime)
-    started_at: Mapped[datetime] = mapped_column(DateTime)
-    transferred_at: Mapped[datetime] = mapped_column(DateTime)
-    estimated_at: Mapped[datetime] = mapped_column(DateTime)
+    submitted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    started_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    transferred_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    estimated_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     submitter_id: Mapped[Optional[int]] = mapped_column(Integer)
-    estimated_started_at: Mapped[datetime] = mapped_column(DateTime)
-    estimated_transferred_at: Mapped[datetime] = mapped_column(DateTime)
-    staging_started_at: Mapped[datetime] = mapped_column(DateTime)
-    staging_finished_at: Mapped[datetime] = mapped_column(DateTime)
+    estimated_started_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    estimated_transferred_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    staging_started_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    staging_finished_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     account: Mapped[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
-    requested_at: Mapped[datetime] = mapped_column(DateTime)
+    requested_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     priority: Mapped[Optional[int]] = mapped_column(Integer)
     transfertool: Mapped[Optional[str]] = mapped_column(String(64))
     __mapper_args__ = {
@@ -1438,13 +1438,13 @@ class Subscription(BASE, ModelBase):
                                                           create_constraint=True,
                                                           values_callable=lambda obj: [e.value for e in obj]),
                                                      default=SubscriptionState.ACTIVE)
-    last_processed: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow())
+    last_processed: Mapped[Optional[datetime]] = mapped_column(DateTime, default=datetime.utcnow())
     account: Mapped[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
-    lifetime: Mapped[datetime] = mapped_column(DateTime)
+    lifetime: Mapped[Optional[datetime]] = mapped_column(DateTime)
     comments: Mapped[Optional[str]] = mapped_column(String(4000))
     retroactive: Mapped[bool] = mapped_column(Boolean(name='SUBSCRIPTIONS_RETROACTIVE_CHK', create_constraint=True),
                                               default=False)
-    expired_at: Mapped[datetime] = mapped_column(DateTime)
+    expired_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('id', name='SUBSCRIPTIONS_PK'),
                    UniqueConstraint('name', 'account', name='SUBSCRIPTIONS_NAME_ACCOUNT_UQ'),
                    ForeignKeyConstraint(['account'], ['accounts.account'], name='SUBSCRIPTIONS_ACCOUNT_FK'),
@@ -1465,13 +1465,13 @@ class SubscriptionHistory(BASE, ModelBase):
                                                           create_constraint=True,
                                                           values_callable=lambda obj: [e.value for e in obj]),
                                                      default=SubscriptionState.ACTIVE)
-    last_processed: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow())
+    last_processed: Mapped[Optional[datetime]] = mapped_column(DateTime, default=datetime.utcnow())
     account: Mapped[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
-    lifetime: Mapped[datetime] = mapped_column(DateTime)
+    lifetime: Mapped[Optional[datetime]] = mapped_column(DateTime)
     comments: Mapped[Optional[str]] = mapped_column(String(4000))
     retroactive: Mapped[bool] = mapped_column(Boolean(name='SUBS_HISTORY_RETROACTIVE_CHK', create_constraint=True),
                                               default=False)
-    expired_at: Mapped[datetime] = mapped_column(DateTime)
+    expired_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('id', 'updated_at', name='SUBSCRIPTIONS_PK'),)
 
 
@@ -1483,8 +1483,8 @@ class Token(BASE, ModelBase):
     refresh_token: Mapped[Optional[str]] = mapped_column(String(3072), default=None)
     refresh: Mapped[bool] = mapped_column(Boolean(name='TOKENS_REFRESH_CHK', create_constraint=True),
                                           default=False)
-    refresh_start: Mapped[datetime] = mapped_column(DateTime, default=None)
-    refresh_expired_at: Mapped[datetime] = mapped_column(DateTime, default=None)
+    refresh_start: Mapped[Optional[datetime]] = mapped_column(DateTime, default=None)
+    refresh_expired_at: Mapped[Optional[datetime]] = mapped_column(DateTime, default=None)
     refresh_lifetime: Mapped[Optional[int]] = mapped_column(Integer())
     oidc_scope: Mapped[Optional[str]] = mapped_column(String(2048), default=None)  # scopes define the specific actions applications can be allowed to do on a user's behalf
     identity: Mapped[Optional[str]] = mapped_column(String(2048))
@@ -1604,7 +1604,7 @@ class TemporaryDataIdentifier(BASE, ModelBase):
     bytes: Mapped[Optional[int]] = mapped_column(BigInteger)
     md5: Mapped[Optional[str]] = mapped_column(String(32))
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
-    expired_at: Mapped[datetime] = mapped_column(DateTime)
+    expired_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     guid: Mapped[uuid.UUID] = mapped_column(GUID())
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
     task_id: Mapped[Optional[int]] = mapped_column(Integer())
@@ -1631,7 +1631,7 @@ class LifetimeExceptions(BASE, ModelBase):
     state: Mapped[LifetimeExceptionsState] = mapped_column(Enum(LifetimeExceptionsState, name='LIFETIME_EXCEPT_STATE_CHK',
                                                                 create_constraint=True,
                                                                 values_callable=lambda obj: [e.value for e in obj]))
-    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('id', 'scope', 'name', 'did_type', 'account', name='LIFETIME_EXCEPT_PK'),
                    CheckConstraint('SCOPE IS NOT NULL', name='LIFETIME_EXCEPT_SCOPE_NN'),
                    CheckConstraint('NAME IS NOT NULL', name='LIFETIME_EXCEPT_NAME_NN'),
