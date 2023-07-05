@@ -13,14 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 import uuid
+from datetime import datetime, timedelta
 
 from sqlalchemy import BigInteger, Boolean, Column, DateTime, Enum, Float, Integer, SmallInteger, String, Text, event, UniqueConstraint, inspect
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import object_mapper, relationship
+from sqlalchemy.orm import mapped_column, object_mapper, relationship, Mapper
 from sqlalchemy.schema import Index, ForeignKeyConstraint, PrimaryKeyConstraint, CheckConstraint, Table
 from sqlalchemy.sql import Delete
 from sqlalchemy.types import LargeBinary
@@ -199,11 +199,11 @@ class ModelBase(object):
 
     @declared_attr
     def created_at(cls):  # pylint: disable=no-self-argument
-        return Column("created_at", DateTime, default=datetime.datetime.utcnow)
+        return Column("created_at", DateTime, default=datetime.utcnow)
 
     @declared_attr
     def updated_at(cls):  # pylint: disable=no-self-argument
-        return Column("updated_at", DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+        return Column("updated_at", DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def save(self, flush=True, session=None):
         """Save this object"""
@@ -274,7 +274,7 @@ class SoftModelBase(ModelBase):
     def delete(self, flush=True, session=None):
         """Delete this object"""
         self.deleted = True
-        self.deleted_at = datetime.datetime.utcnow()
+        self.deleted_at = datetime.utcnow()
         self.save(session=session)
 
 
@@ -1436,7 +1436,7 @@ class Subscription(BASE, ModelBase):
                         create_constraint=True,
                         values_callable=lambda obj: [e.value for e in obj]),
                    default=SubscriptionState.ACTIVE)
-    last_processed = Column(DateTime, default=datetime.datetime.utcnow())
+    last_processed = Column(DateTime, default=datetime.utcnow())
     account = Column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     lifetime = Column(DateTime)
     comments = Column(String(4000))
@@ -1463,7 +1463,7 @@ class SubscriptionHistory(BASE, ModelBase):
                         create_constraint=True,
                         values_callable=lambda obj: [e.value for e in obj]),
                    default=SubscriptionState.ACTIVE)
-    last_processed = Column(DateTime, default=datetime.datetime.utcnow())
+    last_processed = Column(DateTime, default=datetime.utcnow())
     account = Column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     lifetime = Column(DateTime)
     comments = Column(String(4000))
@@ -1487,7 +1487,7 @@ class Token(BASE, ModelBase):
     oidc_scope = Column(String(2048), default=None)  # scopes define the specific actions applications can be allowed to do on a user's behalf
     identity = Column(String(2048))
     audience = Column(String(315), default=None)
-    expired_at = Column(DateTime, default=lambda: datetime.datetime.utcnow() + datetime.timedelta(seconds=3600))  # one hour lifetime by default
+    expired_at = Column(DateTime, default=lambda: datetime.utcnow() + timedelta(seconds=3600))  # one hour lifetime by default
     ip = Column(String(39), nullable=True)
     _table_args = (PrimaryKeyConstraint('token', name='TOKENS_TOKEN_PK'),  # not supported for primary key constraint mysql_length=255
                    ForeignKeyConstraint(['account'], ['accounts.account'], name='TOKENS_ACCOUNT_FK'),
@@ -1505,7 +1505,7 @@ class OAuthRequest(BASE, ModelBase):
     redirect_msg = Column(String(2048))
     refresh_lifetime = Column(Integer())
     ip = Column(String(39), nullable=True)
-    expired_at = Column(DateTime, default=lambda: datetime.datetime.utcnow() + datetime.timedelta(seconds=600))  # 10 min lifetime by default
+    expired_at = Column(DateTime, default=lambda: datetime.utcnow() + timedelta(seconds=600))  # 10 min lifetime by default
     _table_args = (PrimaryKeyConstraint('state', name='OAUTH_REQUESTS_STATE_PK'),
                    CheckConstraint('EXPIRED_AT IS NOT NULL', name='OAUTH_REQUESTS_EXPIRED_AT_NN'),
                    Index('OAUTH_REQUESTS_ACC_EXP_AT_IDX', 'account', 'expired_at'),
