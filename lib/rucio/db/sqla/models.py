@@ -372,15 +372,15 @@ class DataIdentifier(BASE, ModelBase):
     did_type: Mapped[DIDType] = mapped_column(Enum(DIDType, name='DIDS_TYPE_CHK',
                                                    create_constraint=True,
                                                    values_callable=lambda obj: [e.value for e in obj]))
-    is_open: Mapped[bool] = mapped_column(Boolean(name='DIDS_IS_OPEN_CHK', create_constraint=True))
+    is_open: Mapped[Optional[bool]] = mapped_column(Boolean(name='DIDS_IS_OPEN_CHK', create_constraint=True))
     monotonic: Mapped[bool] = mapped_column(Boolean(name='DIDS_MONOTONIC_CHK', create_constraint=True),
                                             server_default='0')
     hidden: Mapped[bool] = mapped_column(Boolean(name='DIDS_HIDDEN_CHK', create_constraint=True),
                                          server_default='0')
     obsolete: Mapped[bool] = mapped_column(Boolean(name='DIDS_OBSOLETE_CHK', create_constraint=True),
                                            server_default='0')
-    complete: Mapped[bool] = mapped_column(Boolean(name='DIDS_COMPLETE_CHK', create_constraint=True),
-                                           server_default=None)
+    complete: Mapped[Optional[bool]] = mapped_column(Boolean(name='DIDS_COMPLETE_CHK', create_constraint=True),
+                                                     server_default=None)
     is_new: Mapped[bool] = mapped_column(Boolean(name='DIDS_IS_NEW_CHK', create_constraint=True),
                                          server_default='1')
     availability: Mapped[DIDAvailability] = mapped_column(Enum(DIDAvailability, name='DIDS_AVAILABILITY_CHK',
@@ -417,8 +417,8 @@ class DataIdentifier(BASE, ModelBase):
     accessed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     eol_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    is_archive: Mapped[bool] = mapped_column(Boolean(name='DIDS_ARCHIVE_CHK', create_constraint=True))
-    constituent: Mapped[bool] = mapped_column(Boolean(name='DIDS_CONSTITUENT_CHK', create_constraint=True))
+    is_archive: Mapped[Optional[bool]] = mapped_column(Boolean(name='DIDS_ARCHIVE_CHK', create_constraint=True))
+    constituent: Mapped[Optional[bool]] = mapped_column(Boolean(name='DIDS_CONSTITUENT_CHK', create_constraint=True))
     access_cnt: Mapped[Optional[int]] = mapped_column(Integer())
     _table_args = (PrimaryKeyConstraint('scope', 'name', name='DIDS_PK'),
                    ForeignKeyConstraint(['account'], ['accounts.account'], ondelete='CASCADE', name='DIDS_ACCOUNT_FK'),
@@ -465,14 +465,14 @@ class DeletedDataIdentifier(BASE, ModelBase):
     did_type: Mapped[DIDType] = mapped_column(Enum(DIDType, name='DEL_DIDS_TYPE_CHK',
                                                    create_constraint=True,
                                                    values_callable=lambda obj: [e.value for e in obj]))
-    is_open: Mapped[bool] = mapped_column(Boolean(name='DEL_DIDS_IS_OPEN_CHK', create_constraint=True))
+    is_open: Mapped[Optional[bool]] = mapped_column(Boolean(name='DEL_DIDS_IS_OPEN_CHK', create_constraint=True))
     monotonic: Mapped[bool] = mapped_column(Boolean(name='DEL_DIDS_MONO_CHK', create_constraint=True),
                                             server_default='0')
     hidden: Mapped[bool] = mapped_column(Boolean(name='DEL_DIDS_HIDDEN_CHK', create_constraint=True),
                                          server_default='0')
     obsolete: Mapped[bool] = mapped_column(Boolean(name='DEL_DIDS_OBSOLETE_CHK', create_constraint=True),
                                            server_default='0')
-    complete: Mapped[bool] = mapped_column(Boolean(name='DEL_DIDS_COMPLETE_CHK', create_constraint=True))
+    complete: Mapped[Optional[bool]] = mapped_column(Boolean(name='DEL_DIDS_COMPLETE_CHK', create_constraint=True))
     is_new: Mapped[bool] = mapped_column(Boolean(name='DEL_DIDS_IS_NEW_CHK', create_constraint=True),
                                          server_default='1')
     availability: Mapped[DIDAvailability] = mapped_column(Enum(DIDAvailability, name='DEL_DIDS_AVAIL_CHK',
@@ -503,12 +503,12 @@ class DeletedDataIdentifier(BASE, ModelBase):
     phys_group: Mapped[Optional[str]] = mapped_column(String(25))
     transient: Mapped[bool] = mapped_column(Boolean(name='DEL_DID_TRANSIENT_CHK', create_constraint=True),
                                             server_default='0')
-    purge_replicas: Mapped[bool] = mapped_column(Boolean(name='DELETED_DIDS_PURGE_RPLCS_CHK', create_constraint=True))
+    purge_replicas: Mapped[Optional[bool]] = mapped_column(Boolean(name='DELETED_DIDS_PURGE_RPLCS_CHK', create_constraint=True))
     accessed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     eol_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    is_archive: Mapped[bool] = mapped_column(Boolean(name='DEL_DIDS_ARCH_CHK', create_constraint=True))
-    constituent: Mapped[bool] = mapped_column(Boolean(name='DEL_DIDS_CONST_CHK', create_constraint=True))
+    is_archive: Mapped[Optional[bool]] = mapped_column(Boolean(name='DEL_DIDS_ARCH_CHK', create_constraint=True))
+    constituent: Mapped[Optional[bool]] = mapped_column(Boolean(name='DEL_DIDS_CONST_CHK', create_constraint=True))
     access_cnt: Mapped[Optional[int]] = mapped_column(Integer())
     _table_args = (PrimaryKeyConstraint('scope', 'name', name='DELETED_DIDS_PK'), )
 
@@ -642,7 +642,7 @@ class DataIdentifierAssociation(BASE, ModelBase):
     md5: Mapped[Optional[str]] = mapped_column(String(32))
     guid: Mapped[uuid.UUID] = mapped_column(GUID())
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
-    rule_evaluation: Mapped[bool] = mapped_column(Boolean(name='CONTENTS_RULE_EVALUATION_CHK', create_constraint=True))
+    rule_evaluation: Mapped[Optional[bool]] = mapped_column(Boolean(name='CONTENTS_RULE_EVALUATION_CHK', create_constraint=True))
     _table_args = (PrimaryKeyConstraint('scope', 'name', 'child_scope', 'child_name', name='CONTENTS_PK'),
                    ForeignKeyConstraint(['scope', 'name'], ['dids.scope', 'dids.name'], name='CONTENTS_ID_FK'),
                    ForeignKeyConstraint(['child_scope', 'child_name'], ['dids.scope', 'dids.name'], ondelete="CASCADE", name='CONTENTS_CHILD_ID_FK'),
@@ -711,7 +711,7 @@ class DataIdentifierAssociationHistory(BASE, ModelBase):
     md5: Mapped[Optional[str]] = mapped_column(String(32))
     guid: Mapped[uuid.UUID] = mapped_column(GUID())
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
-    rule_evaluation: Mapped[bool] = mapped_column(Boolean(name='CONTENTS_HIST_RULE_EVAL_CHK', create_constraint=True))
+    rule_evaluation: Mapped[Optional[bool]] = mapped_column(Boolean(name='CONTENTS_HIST_RULE_EVAL_CHK', create_constraint=True))
     did_created_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     __mapper_args__ = {
