@@ -318,7 +318,7 @@ class Identity(BASE, SoftModelBase):
                                                              values_callable=lambda obj: [e.value for e in obj]))
     username: Mapper[str] = mapped_column(String(255))
     password: Mapper[str] = mapped_column(String(255))
-    salt = Column(LargeBinary(255))
+    salt = mapped_column(LargeBinary(255))
     email: Mapper[str] = mapped_column(String(255))
     _table_args = (PrimaryKeyConstraint('identity', 'identity_type', name='IDENTITIES_PK'),
                    CheckConstraint('IDENTITY_TYPE IS NOT NULL', name='IDENTITIES_TYPE_NN'),
@@ -436,7 +436,7 @@ class VirtualPlacements(BASE, ModelBase):
     __tablename__ = 'virtual_placements'
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
-    placements = Column(JSON())
+    placements = mapped_column(JSON())
     _table_args = (PrimaryKeyConstraint('scope', 'name', name='VP_PK'),
                    ForeignKeyConstraint(['scope', 'name'], ['dids.scope', 'dids.name'], name='VP_FK')
                    )
@@ -446,7 +446,7 @@ class DidMeta(BASE, ModelBase):
     __tablename__ = 'did_meta'
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
-    meta = Column(JSON())
+    meta = mapped_column(JSON())
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='DID_META_DID_TYPE_CHK',
                                                    create_constraint=True,
                                                    values_callable=lambda obj: [e.value for e in obj]))
@@ -1418,7 +1418,7 @@ class Distance(BASE, ModelBase):
     __tablename__ = 'distances'
     src_rse_id: Mapper[uuid.UUID] = mapped_column(GUID())
     dest_rse_id: Mapper[uuid.UUID] = mapped_column(GUID())
-    distance = Column(_distance_column_name, Integer())
+    distance: Mapper[int] = mapped_column(Integer(), name=_distance_column_name)
     _table_args = (PrimaryKeyConstraint('src_rse_id', 'dest_rse_id', name='DISTANCES_PK'),
                    ForeignKeyConstraint(['src_rse_id'], ['rses.id'], name='DISTANCES_SRC_RSES_FK'),
                    ForeignKeyConstraint(['dest_rse_id'], ['rses.id'], name='DISTANCES_DEST_RSES_FK'),
