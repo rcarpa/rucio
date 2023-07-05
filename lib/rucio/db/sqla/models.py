@@ -15,7 +15,7 @@
 
 import uuid
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Union
 
 from sqlalchemy import BigInteger, Boolean, Column, DateTime, Enum, Float, Integer, SmallInteger, String, Text, event, UniqueConstraint, inspect
 from sqlalchemy.engine import Engine
@@ -304,7 +304,7 @@ class AccountAttrAssociation(BASE, ModelBase):
     __tablename__ = 'account_attr_map'
     account: Mapped[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     key: Mapped[str] = mapped_column(String(255))
-    value: Mapped[bool] = mapped_column(BooleanString(255))
+    value: Mapped[Union[bool, str]] = mapped_column(BooleanString(255))
     _table_args = (PrimaryKeyConstraint('account', 'key', name='ACCOUNT_ATTR_MAP_PK'),
                    ForeignKeyConstraint(['account'], ['accounts.account'], name='ACCOUNT_ATTR_MAP_ACCOUNT_FK'),
                    Index('ACCOUNT_ATTR_MAP_KEY_VALUE_IDX', 'key', 'value'))
@@ -842,7 +842,7 @@ class RSEAttrAssociation(BASE, ModelBase):
     __tablename__ = 'rse_attr_map'
     rse_id: Mapped[uuid.UUID] = mapped_column(GUID())
     key: Mapped[str] = mapped_column(String(255))
-    value: Mapped[bool] = mapped_column(BooleanString(255))
+    value: Mapped[Union[bool, str]] = mapped_column(BooleanString(255))
     _table_args = (PrimaryKeyConstraint('rse_id', 'key', name='RSE_ATTR_MAP_PK'),
                    ForeignKeyConstraint(['rse_id'], ['rses.id'], name='RSE_ATTR_MAP_RSE_ID_FK'),
                    Index('RSE_ATTR_MAP_KEY_VALUE_IDX', 'key', 'value'))
