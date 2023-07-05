@@ -745,8 +745,8 @@ class RSE(BASE, SoftModelBase):
     time_zone: Mapped[Optional[str]] = mapped_column(String(255))
     ISP: Mapped[Optional[str]] = mapped_column(String(255))
     ASN: Mapped[Optional[str]] = mapped_column(String(255))
-    longitude: Mapped[float] = mapped_column(Float())
-    latitude: Mapped[float] = mapped_column(Float())
+    longitude: Mapped[Optional[float]] = mapped_column(Float())
+    latitude: Mapped[Optional[float]] = mapped_column(Float())
     availability: Mapped[int] = mapped_column(Integer, server_default='7')  # Deprecated, will be removedx
     availability_read: Mapped[bool] = mapped_column(Boolean, default=True)
     availability_write: Mapped[bool] = mapped_column(Boolean, default=True)
