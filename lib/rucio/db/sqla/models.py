@@ -399,7 +399,7 @@ class DataIdentifier(BASE, ModelBase):
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     # hardcoded meta-data to populate the db
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
-    guid: Mapped[uuid.UUID] = mapped_column(GUID())
+    guid: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     project: Mapped[Optional[str]] = mapped_column(String(50))
     datatype: Mapped[Optional[str]] = mapped_column(String(50))
     run_number: Mapped[Optional[int]] = mapped_column(Integer)
@@ -488,7 +488,7 @@ class DeletedDataIdentifier(BASE, ModelBase):
     expired_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
-    guid: Mapped[uuid.UUID] = mapped_column(GUID())
+    guid: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     project: Mapped[Optional[str]] = mapped_column(String(50))
     datatype: Mapped[Optional[str]] = mapped_column(String(50))
     run_number: Mapped[Optional[int]] = mapped_column(Integer)
@@ -640,7 +640,7 @@ class DataIdentifierAssociation(BASE, ModelBase):
     bytes: Mapped[Optional[int]] = mapped_column(BigInteger)
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
     md5: Mapped[Optional[str]] = mapped_column(String(32))
-    guid: Mapped[uuid.UUID] = mapped_column(GUID())
+    guid: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
     rule_evaluation: Mapped[Optional[bool]] = mapped_column(Boolean(name='CONTENTS_RULE_EVALUATION_CHK', create_constraint=True))
     _table_args = (PrimaryKeyConstraint('scope', 'name', 'child_scope', 'child_name', name='CONTENTS_PK'),
@@ -662,7 +662,7 @@ class ConstituentAssociation(BASE, ModelBase):
     bytes: Mapped[Optional[int]] = mapped_column(BigInteger)
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
     md5: Mapped[Optional[str]] = mapped_column(String(32))
-    guid: Mapped[uuid.UUID] = mapped_column(GUID())
+    guid: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     length: Mapped[Optional[int]] = mapped_column(BigInteger)
     _table_args = (PrimaryKeyConstraint('child_scope', 'child_name', 'scope', 'name',
                                         name='ARCH_CONTENTS_PK'),
@@ -685,7 +685,7 @@ class ConstituentAssociationHistory(BASE, ModelBase):
     bytes: Mapped[Optional[int]] = mapped_column(BigInteger)
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
     md5: Mapped[Optional[str]] = mapped_column(String(32))
-    guid: Mapped[uuid.UUID] = mapped_column(GUID())
+    guid: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     length: Mapped[Optional[int]] = mapped_column(BigInteger)
     __mapper_args__ = {
         'primary_key': [scope, name, child_scope, child_name]  # Fake primary key for SQLA
@@ -709,7 +709,7 @@ class DataIdentifierAssociationHistory(BASE, ModelBase):
     bytes: Mapped[Optional[int]] = mapped_column(BigInteger)
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
     md5: Mapped[Optional[str]] = mapped_column(String(32))
-    guid: Mapped[uuid.UUID] = mapped_column(GUID())
+    guid: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
     rule_evaluation: Mapped[Optional[bool]] = mapped_column(Boolean(name='CONTENTS_HIST_RULE_EVAL_CHK', create_constraint=True))
     did_created_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
@@ -988,7 +988,7 @@ class UpdatedCollectionReplica(BASE, ModelBase):
     did_type: Mapped[DIDType] = mapped_column(Enum(DIDType, name='UPDATED_COL_REP_TYPE_CHK',
                                                    create_constraint=True,
                                                    values_callable=lambda obj: [e.value for e in obj]))
-    rse_id: Mapped[uuid.UUID] = mapped_column(GUID())
+    rse_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     _table_args = (PrimaryKeyConstraint('id', name='UPDATED_COL_REP_PK'),
                    CheckConstraint('SCOPE IS NOT NULL', name='UPDATED_COL_REP_SCOPE_NN'),
                    CheckConstraint('NAME IS NOT NULL', name='UPDATED_COL_REP_NAME_NN'),
@@ -1051,7 +1051,7 @@ class ReplicationRule(BASE, ModelBase):
                                                        default=False)
     priority: Mapped[Optional[int]] = mapped_column(Integer)
     comments: Mapped[Optional[str]] = mapped_column(String(255))
-    child_rule_id: Mapped[uuid.UUID] = mapped_column(GUID())
+    child_rule_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     eol_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     split_container: Mapped[bool] = mapped_column(Boolean(name='RULES_SPLIT_CONTAINER_CHK', create_constraint=True),
                                                   default=False)
@@ -1117,7 +1117,7 @@ class ReplicationRuleHistoryRecent(BASE, ModelBase):
     ignore_account_limit: Mapped[bool] = mapped_column(Boolean())
     priority: Mapped[Optional[int]] = mapped_column(Integer)
     comments: Mapped[Optional[str]] = mapped_column(String(255))
-    child_rule_id: Mapped[uuid.UUID] = mapped_column(GUID())
+    child_rule_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     eol_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     split_container: Mapped[bool] = mapped_column(Boolean())
     meta: Mapped[Optional[str]] = mapped_column(String(4000))
@@ -1165,7 +1165,7 @@ class ReplicationRuleHistory(BASE, ModelBase):
     ignore_availability: Mapped[bool] = mapped_column(Boolean())
     ignore_account_limit: Mapped[bool] = mapped_column(Boolean())
     comments: Mapped[Optional[str]] = mapped_column(String(255))
-    child_rule_id: Mapped[uuid.UUID] = mapped_column(GUID())
+    child_rule_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     eol_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     split_container: Mapped[bool] = mapped_column(Boolean())
     meta: Mapped[Optional[str]] = mapped_column(String(4000))
@@ -1251,7 +1251,7 @@ class Request(BASE, ModelBase):
                                                    values_callable=lambda obj: [e.value for e in obj]),
                                               default=DIDType.FILE)
     dest_rse_id: Mapped[uuid.UUID] = mapped_column(GUID())
-    source_rse_id: Mapped[uuid.UUID] = mapped_column(GUID())
+    source_rse_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     attributes: Mapped[Optional[str]] = mapped_column(String(4000))
     state: Mapped[RequestState] = mapped_column(Enum(RequestState, name='REQUESTS_STATE_CHK',
                                                      create_constraint=True,
@@ -1261,8 +1261,8 @@ class Request(BASE, ModelBase):
     external_host: Mapped[Optional[str]] = mapped_column(String(256))
     retry_count: Mapped[int] = mapped_column(Integer(), server_default='0')
     err_msg: Mapped[Optional[str]] = mapped_column(String(4000))
-    previous_attempt_id: Mapped[uuid.UUID] = mapped_column(GUID())
-    rule_id: Mapped[uuid.UUID] = mapped_column(GUID())
+    previous_attempt_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
+    rule_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     activity: Mapped[Optional[str]] = mapped_column(String(50), default='default')
     bytes: Mapped[Optional[int]] = mapped_column(BigInteger)
     md5: Mapped[Optional[str]] = mapped_column(String(32))
@@ -1324,7 +1324,7 @@ class RequestHistory(BASE, ModelBase):
                                                    values_callable=lambda obj: [e.value for e in obj]),
                                               default=DIDType.FILE)
     dest_rse_id: Mapped[uuid.UUID] = mapped_column(GUID())
-    source_rse_id: Mapped[uuid.UUID] = mapped_column(GUID())
+    source_rse_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     attributes: Mapped[Optional[str]] = mapped_column(String(4000))
     state: Mapped[RequestState] = mapped_column(Enum(RequestState, name='REQUESTS_HIST_STATE_CHK',
                                                      create_constraint=True,
@@ -1334,8 +1334,8 @@ class RequestHistory(BASE, ModelBase):
     external_host: Mapped[Optional[str]] = mapped_column(String(256))
     retry_count: Mapped[int] = mapped_column(Integer(), server_default='0')
     err_msg: Mapped[Optional[str]] = mapped_column(String(4000))
-    previous_attempt_id: Mapped[uuid.UUID] = mapped_column(GUID())
-    rule_id: Mapped[uuid.UUID] = mapped_column(GUID())
+    previous_attempt_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
+    rule_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     activity: Mapped[Optional[str]] = mapped_column(String(50), default='default')
     bytes: Mapped[Optional[int]] = mapped_column(BigInteger)
     md5: Mapped[Optional[str]] = mapped_column(String(32))
@@ -1599,13 +1599,13 @@ class TemporaryDataIdentifier(BASE, ModelBase):
     __tablename__ = 'tmp_dids'
     scope: Mapped[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapped[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
-    rse_id: Mapped[uuid.UUID] = mapped_column(GUID())
+    rse_id: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     path: Mapped[Optional[str]] = mapped_column(String(1024))
     bytes: Mapped[Optional[int]] = mapped_column(BigInteger)
     md5: Mapped[Optional[str]] = mapped_column(String(32))
     adler32: Mapped[Optional[str]] = mapped_column(String(8))
     expired_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    guid: Mapped[uuid.UUID] = mapped_column(GUID())
+    guid: Mapped[Optional[uuid.UUID]] = mapped_column(GUID())
     events: Mapped[Optional[int]] = mapped_column(BigInteger)
     task_id: Mapped[Optional[int]] = mapped_column(Integer())
     panda_id: Mapped[Optional[int]] = mapped_column(Integer())
