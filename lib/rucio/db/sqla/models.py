@@ -284,12 +284,12 @@ class Account(BASE, ModelBase):
     __tablename__ = 'accounts'
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     account_type: Mapper[AccountType] = mapped_column(Enum(AccountType, name='ACCOUNTS_TYPE_CHK',
-                               create_constraint=True,
-                               values_callable=lambda obj: [e.value for e in obj]))
+                                                           create_constraint=True,
+                                                           values_callable=lambda obj: [e.value for e in obj]))
     status: Mapper[AccountStatus] = mapped_column(Enum(AccountStatus, name='ACCOUNTS_STATUS_CHK',
-                         create_constraint=True,
-                         values_callable=lambda obj: [e.value for e in obj]),
-                    default=AccountStatus.ACTIVE, )
+                                                       create_constraint=True,
+                                                       values_callable=lambda obj: [e.value for e in obj]),
+                                                  default=AccountStatus.ACTIVE, )
     email: Mapper[str] = mapped_column(String(255))
     suspended_at: Mapper[datetime] = mapped_column(DateTime)
     deleted_at: Mapper[datetime] = mapped_column(DateTime)
@@ -314,8 +314,8 @@ class Identity(BASE, SoftModelBase):
     __tablename__ = 'identities'
     identity: Mapper[str] = mapped_column(String(2048))
     identity_type: Mapper[IdentityType] = mapped_column(Enum(IdentityType, name='IDENTITIES_TYPE_CHK',
-                                create_constraint=True,
-                                values_callable=lambda obj: [e.value for e in obj]))
+                                                             create_constraint=True,
+                                                             values_callable=lambda obj: [e.value for e in obj]))
     username: Mapper[str] = mapped_column(String(255))
     password: Mapper[str] = mapped_column(String(255))
     salt = Column(LargeBinary(255))
@@ -330,11 +330,11 @@ class IdentityAccountAssociation(BASE, ModelBase):
     __tablename__ = 'account_map'
     identity: Mapper[str] = mapped_column(String(2048))
     identity_type: Mapper[IdentityType] = mapped_column(Enum(IdentityType, name='ACCOUNT_MAP_ID_TYPE_CHK',
-                                create_constraint=True,
-                                values_callable=lambda obj: [e.value for e in obj]))
+                                                             create_constraint=True,
+                                                             values_callable=lambda obj: [e.value for e in obj]))
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     is_default: Mapper[bool] = mapped_column(Boolean(name='ACCOUNT_MAP_DEFAULT_CHK', create_constraint=True),
-                        default=False)
+                                             default=False)
     _table_args = (PrimaryKeyConstraint('identity', 'identity_type', 'account', name='ACCOUNT_MAP_PK'),
                    ForeignKeyConstraint(['account'], ['accounts.account'], name='ACCOUNT_MAP_ACCOUNT_FK'),
                    ForeignKeyConstraint(['identity', 'identity_type'], ['identities.identity', 'identities.identity_type'], name='ACCOUNT_MAP_ID_TYPE_FK'),
@@ -348,11 +348,11 @@ class Scope(BASE, ModelBase):
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     is_default: Mapper[bool] = mapped_column(Boolean(name='SCOPES_DEFAULT_CHK', create_constraint=True),
-                        default=False)
+                                             default=False)
     status: Mapper[ScopeStatus] = mapped_column(Enum(ScopeStatus, name='SCOPE_STATUS_CHK',
-                         create_constraint=True,
-                         values_callable=lambda obj: [e.value for e in obj]),
-                    default=ScopeStatus.OPEN)
+                                                     create_constraint=True,
+                                                     values_callable=lambda obj: [e.value for e in obj]),
+                                                default=ScopeStatus.OPEN)
     closed_at: Mapper[datetime] = mapped_column(DateTime)
     deleted_at: Mapper[datetime] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('scope', name='SCOPES_SCOPE_PK'),
@@ -369,32 +369,32 @@ class DataIdentifier(BASE, ModelBase):
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='DIDS_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     is_open: Mapper[bool] = mapped_column(Boolean(name='DIDS_IS_OPEN_CHK', create_constraint=True))
     monotonic: Mapper[bool] = mapped_column(Boolean(name='DIDS_MONOTONIC_CHK', create_constraint=True),
-                       server_default='0')
+                                            server_default='0')
     hidden: Mapper[bool] = mapped_column(Boolean(name='DIDS_HIDDEN_CHK', create_constraint=True),
-                    server_default='0')
+                                         server_default='0')
     obsolete: Mapper[bool] = mapped_column(Boolean(name='DIDS_OBSOLETE_CHK', create_constraint=True),
-                      server_default='0')
+                                           server_default='0')
     complete: Mapper[bool] = mapped_column(Boolean(name='DIDS_COMPLETE_CHK', create_constraint=True),
-                      server_default=None)
+                                           server_default=None)
     is_new: Mapper[bool] = mapped_column(Boolean(name='DIDS_IS_NEW_CHK', create_constraint=True),
-                    server_default='1')
+                                         server_default='1')
     availability: Mapper[DIDAvailability] = mapped_column(Enum(DIDAvailability, name='DIDS_AVAILABILITY_CHK',
-                               create_constraint=True,
-                               values_callable=lambda obj: [e.value for e in obj]),
-                          default=DIDAvailability.AVAILABLE)
+                                                               create_constraint=True,
+                                                               values_callable=lambda obj: [e.value for e in obj]),
+                                                          default=DIDAvailability.AVAILABLE)
     suppressed: Mapper[bool] = mapped_column(Boolean(name='FILES_SUPP_CHK', create_constraint=True),
-                        server_default='0')
+                                             server_default='0')
     bytes: Mapper[int] = mapped_column(BigInteger)
     length: Mapper[int] = mapped_column(BigInteger)
     md5: Mapper[str] = mapped_column(String(32))
     adler32: Mapper[str] = mapped_column(String(8))
     expired_at: Mapper[datetime] = mapped_column(DateTime)
     purge_replicas: Mapper[bool] = mapped_column(Boolean(name='DIDS_PURGE_RPLCS_CHK', create_constraint=True),
-                            server_default='1')
+                                                 server_default='1')
     deleted_at: Mapper[datetime] = mapped_column(DateTime)
     # hardcoded meta-data to populate the db
     events: Mapper[int] = mapped_column(BigInteger)
@@ -412,7 +412,7 @@ class DataIdentifier(BASE, ModelBase):
     provenance: Mapper[str] = mapped_column(String(2))
     phys_group: Mapper[str] = mapped_column(String(25))
     transient: Mapper[bool] = mapped_column(Boolean(name='DID_TRANSIENT_CHK', create_constraint=True),
-                       server_default='0')
+                                            server_default='0')
     accessed_at: Mapper[datetime] = mapped_column(DateTime)
     closed_at: Mapper[datetime] = mapped_column(DateTime)
     eol_at: Mapper[datetime] = mapped_column(DateTime)
@@ -448,8 +448,8 @@ class DidMeta(BASE, ModelBase):
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     meta = Column(JSON())
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='DID_META_DID_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     _table_args = (PrimaryKeyConstraint('scope', 'name', name='DID_META_PK'),
                    ForeignKeyConstraint(['scope', 'name'], ['dids.scope', 'dids.name'], name='DID_META_FK'),
                    Index('DID_META_DID_TYPE_IDX', 'did_type'))
@@ -462,24 +462,24 @@ class DeletedDataIdentifier(BASE, ModelBase):
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='DEL_DIDS_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     is_open: Mapper[bool] = mapped_column(Boolean(name='DEL_DIDS_IS_OPEN_CHK', create_constraint=True))
     monotonic: Mapper[bool] = mapped_column(Boolean(name='DEL_DIDS_MONO_CHK', create_constraint=True),
-                       server_default='0')
+                                            server_default='0')
     hidden: Mapper[bool] = mapped_column(Boolean(name='DEL_DIDS_HIDDEN_CHK', create_constraint=True),
-                    server_default='0')
+                                         server_default='0')
     obsolete: Mapper[bool] = mapped_column(Boolean(name='DEL_DIDS_OBSOLETE_CHK', create_constraint=True),
-                      server_default='0')
+                                           server_default='0')
     complete: Mapper[bool] = mapped_column(Boolean(name='DEL_DIDS_COMPLETE_CHK', create_constraint=True))
     is_new: Mapper[bool] = mapped_column(Boolean(name='DEL_DIDS_IS_NEW_CHK', create_constraint=True),
-                    server_default='1')
+                                         server_default='1')
     availability: Mapper[DIDAvailability] = mapped_column(Enum(DIDAvailability, name='DEL_DIDS_AVAIL_CHK',
-                               create_constraint=True,
-                               values_callable=lambda obj: [e.value for e in obj]),
-                          default=DIDAvailability.AVAILABLE)
+                                                               create_constraint=True,
+                                                               values_callable=lambda obj: [e.value for e in obj]),
+                                                          default=DIDAvailability.AVAILABLE)
     suppressed: Mapper[bool] = mapped_column(Boolean(name='DEL_FILES_SUPP_CHK', create_constraint=True),
-                        server_default='0')
+                                             server_default='0')
     bytes: Mapper[int] = mapped_column(BigInteger)
     length: Mapper[int] = mapped_column(BigInteger)
     md5: Mapper[str] = mapped_column(String(32))
@@ -501,7 +501,7 @@ class DeletedDataIdentifier(BASE, ModelBase):
     provenance: Mapper[str] = mapped_column(String(2))
     phys_group: Mapper[str] = mapped_column(String(25))
     transient: Mapper[bool] = mapped_column(Boolean(name='DEL_DID_TRANSIENT_CHK', create_constraint=True),
-                       server_default='0')
+                                            server_default='0')
     purge_replicas: Mapper[bool] = mapped_column(Boolean(name='DELETED_DIDS_PURGE_RPLCS_CHK', create_constraint=True))
     accessed_at: Mapper[datetime] = mapped_column(DateTime)
     closed_at: Mapper[datetime] = mapped_column(DateTime)
@@ -519,8 +519,8 @@ class UpdatedDID(BASE, ModelBase):
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     rule_evaluation_action: Mapper[DIDReEvaluation] = mapped_column(Enum(DIDReEvaluation, name='UPDATED_DIDS_RULE_EVAL_ACT_CHK',
-                                         create_constraint=True,
-                                         values_callable=lambda obj: [e.value for e in obj]))
+                                                                         create_constraint=True,
+                                                                         values_callable=lambda obj: [e.value for e in obj]))
     _table_args = (PrimaryKeyConstraint('id', name='UPDATED_DIDS_PK'),
                    CheckConstraint('SCOPE IS NOT NULL', name='UPDATED_DIDS_SCOPE_NN'),
                    CheckConstraint('NAME IS NOT NULL', name='UPDATED_DIDS_NAME_NN'),
@@ -535,9 +535,9 @@ class BadReplicas(BASE, ModelBase):
     rse_id = Column(GUID())
     reason: Mapper[str] = mapped_column(String(255))
     state: Mapper[BadFilesStatus] = mapped_column(Enum(BadFilesStatus, name='BAD_REPLICAS_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=BadFilesStatus.SUSPICIOUS)
+                                                       create_constraint=True,
+                                                       values_callable=lambda obj: [e.value for e in obj]),
+                                                  default=BadFilesStatus.SUSPICIOUS)
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     bytes: Mapper[int] = mapped_column(BigInteger)
     expires_at: Mapper[datetime] = mapped_column(DateTime)
@@ -556,9 +556,9 @@ class BadPFNs(BASE, ModelBase):
     __tablename__ = 'bad_pfns'
     path: Mapper[str] = mapped_column(String(2048))  # PREFIX + PFN
     state: Mapper[BadPFNStatus] = mapped_column(Enum(BadPFNStatus, name='BAD_PFNS_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=BadPFNStatus.SUSPICIOUS)
+                                                     create_constraint=True,
+                                                     values_callable=lambda obj: [e.value for e in obj]),
+                                                default=BadPFNStatus.SUSPICIOUS)
     reason: Mapper[str] = mapped_column(String(255))
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     expires_at: Mapper[datetime] = mapped_column(DateTime)
@@ -603,10 +603,10 @@ class DIDKey(BASE, ModelBase):
     __tablename__ = 'did_keys'
     key: Mapper[str] = mapped_column(String(255))
     is_enum: Mapper[bool] = mapped_column(Boolean(name='DID_KEYS_IS_ENUM_CHK', create_constraint=True),
-                     server_default='0')
+                                          server_default='0')
     key_type: Mapper[KeyType] = mapped_column(Enum(KeyType, name='DID_KEYS_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     value_type: Mapper[str] = mapped_column(String(255))
     value_regexp: Mapper[str] = mapped_column(String(255))
     _table_args = (PrimaryKeyConstraint('key', name='DID_KEYS_PK'),
@@ -631,11 +631,11 @@ class DataIdentifierAssociation(BASE, ModelBase):
     child_scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))  # Provenance scope
     child_name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))    # Provenance name
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='CONTENTS_DID_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     child_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='CONTENTS_CHILD_TYPE_CHK',
-                             create_constraint=True,
-                             values_callable=lambda obj: [e.value for e in obj]))
+                                                     create_constraint=True,
+                                                     values_callable=lambda obj: [e.value for e in obj]))
     bytes: Mapper[int] = mapped_column(BigInteger)
     adler32: Mapper[str] = mapped_column(String(8))
     md5: Mapper[str] = mapped_column(String(32))
@@ -700,11 +700,11 @@ class DataIdentifierAssociationHistory(BASE, ModelBase):
     child_scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))          # Provenance scope
     child_name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))  # Provenance name
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='CONTENTS_HIST_DID_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     child_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='CONTENTS_HIST_CHILD_TYPE_CHK',
-                             create_constraint=True,
-                             values_callable=lambda obj: [e.value for e in obj]))
+                                                     create_constraint=True,
+                                                     values_callable=lambda obj: [e.value for e in obj]))
     bytes: Mapper[int] = mapped_column(BigInteger)
     adler32: Mapper[str] = mapped_column(String(8))
     md5: Mapper[str] = mapped_column(String(32))
@@ -728,15 +728,15 @@ class RSE(BASE, SoftModelBase):
     rse: Mapper[str] = mapped_column(String(255))
     vo: Mapper[str] = mapped_column(String(3), nullable=False, server_default='def')
     rse_type: Mapper[RSEType] = mapped_column(Enum(RSEType, name='RSES_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]),
-                      default=RSEType.DISK)
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]),
+                                              default=RSEType.DISK)
     deterministic: Mapper[bool] = mapped_column(Boolean(name='RSE_DETERMINISTIC_CHK', create_constraint=True),
-                           default=True)
+                                                default=True)
     volatile: Mapper[bool] = mapped_column(Boolean(name='RSE_VOLATILE_CHK', create_constraint=True),
-                      default=False)
+                                           default=False)
     staging_area: Mapper[bool] = mapped_column(Boolean(name='RSE_STAGING_AREA_CHK', create_constraint=True),
-                          default=False)
+                                               default=False)
     city: Mapper[str] = mapped_column(String(255))
     region_code: Mapper[str] = mapped_column(String(2))
     country_name: Mapper[str] = mapped_column(String(255))
@@ -776,9 +776,9 @@ class TransferLimit(BASE, ModelBase):
     rse_expression: Mapper[str] = mapped_column(String(3000))
     activity: Mapper[str] = mapped_column(String(50))
     direction: Mapper[TransferLimitDirection] = mapped_column(Enum(TransferLimitDirection, name='TRANSFER_LIMITS_DIRECTION_TYPE_CHK',
-                            create_constraint=True,
-                            values_callable=lambda obj: [e.value for e in obj]),
-                       default=TransferLimitDirection.DESTINATION)
+                                                                   create_constraint=True,
+                                                                   values_callable=lambda obj: [e.value for e in obj]),
+                                                              default=TransferLimitDirection.DESTINATION)
     max_transfers: Mapper[int] = mapped_column(BigInteger)
     volume: Mapper[int] = mapped_column(BigInteger)
     deadline: Mapper[int] = mapped_column(BigInteger)
@@ -933,9 +933,9 @@ class RSEFileAssociation(BASE, ModelBase):
     adler32: Mapper[str] = mapped_column(String(8))
     path: Mapper[str] = mapped_column(String(1024))
     state: Mapper[ReplicaState] = mapped_column(Enum(ReplicaState, name='REPLICAS_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=ReplicaState.UNAVAILABLE)
+                                                     create_constraint=True,
+                                                     values_callable=lambda obj: [e.value for e in obj]),
+                                                default=ReplicaState.UNAVAILABLE)
     lock_cnt: Mapper[int] = mapped_column(Integer, server_default='0')
     accessed_at: Mapper[datetime] = mapped_column(DateTime)
     tombstone: Mapper[datetime] = mapped_column(DateTime)
@@ -958,17 +958,17 @@ class CollectionReplica(BASE, ModelBase):
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='COLLECTION_REPLICAS_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     rse_id = Column(GUID())
     bytes: Mapper[int] = mapped_column(BigInteger)
     length: Mapper[int] = mapped_column(BigInteger)
     available_bytes: Mapper[int] = mapped_column(BigInteger)
     available_replicas_cnt: Mapper[int] = mapped_column(BigInteger)
     state: Mapper[ReplicaState] = mapped_column(Enum(ReplicaState, name='COLLECTION_REPLICAS_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=ReplicaState.UNAVAILABLE)
+                                                     create_constraint=True,
+                                                     values_callable=lambda obj: [e.value for e in obj]),
+                                                default=ReplicaState.UNAVAILABLE)
     accessed_at: Mapper[datetime] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('scope', 'name', 'rse_id', name='COLLECTION_REPLICAS_PK'),
                    ForeignKeyConstraint(['scope', 'name'], ['dids.scope', 'dids.name'], name='COLLECTION_REPLICAS_LFN_FK'),
@@ -985,8 +985,8 @@ class UpdatedCollectionReplica(BASE, ModelBase):
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='UPDATED_COL_REP_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     rse_id = Column(GUID())
     _table_args = (PrimaryKeyConstraint('id', name='UPDATED_COL_REP_PK'),
                    CheckConstraint('SCOPE IS NOT NULL', name='UPDATED_COL_REP_SCOPE_NN'),
@@ -1015,45 +1015,45 @@ class ReplicationRule(BASE, ModelBase):
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='RULES_DID_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     state: Mapper[RuleState] = mapped_column(Enum(RuleState, name='RULES_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=RuleState.REPLICATING)
+                                                  create_constraint=True,
+                                                  values_callable=lambda obj: [e.value for e in obj]),
+                                             default=RuleState.REPLICATING)
     error: Mapper[str] = mapped_column(String(255))
     rse_expression: Mapper[str] = mapped_column(String(3000))
     copies: Mapper[int] = mapped_column(SmallInteger, server_default='1')
     expires_at: Mapper[datetime] = mapped_column(DateTime)
     weight: Mapper[str] = mapped_column(String(255))
     locked: Mapper[bool] = mapped_column(Boolean(name='RULES_LOCKED_CHK', create_constraint=True),
-                    default=False)
+                                         default=False)
     locks_ok_cnt: Mapper[int] = mapped_column(BigInteger, server_default='0')
     locks_replicating_cnt: Mapper[int] = mapped_column(BigInteger, server_default='0')
     locks_stuck_cnt: Mapper[int] = mapped_column(BigInteger, server_default='0')
     source_replica_expression: Mapper[str] = mapped_column(String(255))
     activity: Mapper[str] = mapped_column(String(50), default='default')
     grouping: Mapper[RuleGrouping] = mapped_column(Enum(RuleGrouping, name='RULES_GROUPING_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]),
-                      default=RuleGrouping.ALL)
+                                                        create_constraint=True,
+                                                        values_callable=lambda obj: [e.value for e in obj]),
+                                                   default=RuleGrouping.ALL)
     notification: Mapper[RuleNotification] = mapped_column(Enum(RuleNotification, name='RULES_NOTIFICATION_CHK',
-                               create_constraint=True,
-                               values_callable=lambda obj: [e.value for e in obj]),
-                          default=RuleNotification.NO)
+                                                                create_constraint=True,
+                                                                values_callable=lambda obj: [e.value for e in obj]),
+                                                           default=RuleNotification.NO)
     stuck_at: Mapper[datetime] = mapped_column(DateTime)
     purge_replicas: Mapper[bool] = mapped_column(Boolean(name='RULES_PURGE_REPLICAS_CHK', create_constraint=True),
-                            default=False)
+                                                 default=False)
     ignore_availability: Mapper[bool] = mapped_column(Boolean(name='RULES_IGNORE_AVAILABILITY_CHK', create_constraint=True),
-                                 default=False)
+                                                      default=False)
     ignore_account_limit: Mapper[bool] = mapped_column(Boolean(name='RULES_IGNORE_ACCOUNT_LIMIT_CHK', create_constraint=True),
-                                  default=False)
+                                                       default=False)
     priority: Mapper[int] = mapped_column(Integer)
     comments: Mapper[str] = mapped_column(String(255))
     child_rule_id = Column(GUID())
     eol_at: Mapper[datetime] = mapped_column(DateTime)
     split_container: Mapper[bool] = mapped_column(Boolean(name='RULES_SPLIT_CONTAINER_CHK', create_constraint=True),
-                             default=False)
+                                                  default=False)
     meta: Mapper[str] = mapped_column(String(4000))
     _table_args = (PrimaryKeyConstraint('id', name='RULES_PK'),
                    ForeignKeyConstraint(['scope', 'name'], ['dids.scope', 'dids.name'], name='RULES_SCOPE_NAME_FK'),
@@ -1088,11 +1088,11 @@ class ReplicationRuleHistoryRecent(BASE, ModelBase):
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='RULES_HIST_RECENT_DIDTYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     state: Mapper[RuleState] = mapped_column(Enum(RuleState, name='RULES_HIST_RECENT_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]))
+                                                  create_constraint=True,
+                                                  values_callable=lambda obj: [e.value for e in obj]))
     error: Mapper[str] = mapped_column(String(255))
     rse_expression: Mapper[str] = mapped_column(String(3000))
     copies: Mapper[int] = mapped_column(SmallInteger)
@@ -1105,11 +1105,11 @@ class ReplicationRuleHistoryRecent(BASE, ModelBase):
     source_replica_expression: Mapper[str] = mapped_column(String(255))
     activity: Mapper[str] = mapped_column(String(50))
     grouping: Mapper[RuleGrouping] = mapped_column(Enum(RuleGrouping, name='RULES_HIST_RECENT_GROUPING_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                        create_constraint=True,
+                                                        values_callable=lambda obj: [e.value for e in obj]))
     notification: Mapper[RuleNotification] = mapped_column(Enum(RuleNotification, name='RULES_HIST_RECENT_NOTIFY_CHK',
-                               create_constraint=True,
-                               values_callable=lambda obj: [e.value for e in obj]))
+                                                                create_constraint=True,
+                                                                values_callable=lambda obj: [e.value for e in obj]))
     stuck_at: Mapper[datetime] = mapped_column(DateTime)
     purge_replicas: Mapper[bool] = mapped_column(Boolean())
     ignore_availability: Mapper[bool] = mapped_column(Boolean())
@@ -1136,11 +1136,11 @@ class ReplicationRuleHistory(BASE, ModelBase):
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='RULES_HISTORY_DIDTYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     state: Mapper[RuleState] = mapped_column(Enum(RuleState, name='RULES_HISTORY_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]))
+                                                  create_constraint=True,
+                                                  values_callable=lambda obj: [e.value for e in obj]))
     error: Mapper[str] = mapped_column(String(255))
     rse_expression: Mapper[str] = mapped_column(String(3000))
     copies: Mapper[int] = mapped_column(SmallInteger)
@@ -1153,11 +1153,11 @@ class ReplicationRuleHistory(BASE, ModelBase):
     source_replica_expression: Mapper[str] = mapped_column(String(255))
     activity: Mapper[str] = mapped_column(String(50))
     grouping: Mapper[RuleGrouping] = mapped_column(Enum(RuleGrouping, name='RULES_HISTORY_GROUPING_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                        create_constraint=True,
+                                                        values_callable=lambda obj: [e.value for e in obj]))
     notification: Mapper[RuleNotification] = mapped_column(Enum(RuleNotification, name='RULES_HISTORY_NOTIFY_CHK',
-                               create_constraint=True,
-                               values_callable=lambda obj: [e.value for e in obj]))
+                                                                create_constraint=True,
+                                                                values_callable=lambda obj: [e.value for e in obj]))
     stuck_at: Mapper[datetime] = mapped_column(DateTime)
     priority: Mapper[int] = mapped_column(Integer)
     purge_replicas: Mapper[bool] = mapped_column(Boolean())
@@ -1184,9 +1184,9 @@ class ReplicaLock(BASE, ModelBase):
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     bytes: Mapper[int] = mapped_column(BigInteger)
     state: Mapper[LockState] = mapped_column(Enum(LockState, name='LOCKS_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=LockState.REPLICATING)
+                                                  create_constraint=True,
+                                                  values_callable=lambda obj: [e.value for e in obj]),
+                                             default=LockState.REPLICATING)
     repair_cnt: Mapper[int] = mapped_column(BigInteger)
     _table_args = (PrimaryKeyConstraint('scope', 'name', 'rule_id', 'rse_id', name='LOCKS_PK'),
                    ForeignKeyConstraint(['rule_id'], ['rules.id'], name='LOCKS_RULE_ID_FK'),
@@ -1205,9 +1205,9 @@ class DatasetLock(BASE, ModelBase):
     rse_id = Column(GUID())
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     state: Mapper[LockState] = mapped_column(Enum(LockState, name='DATASET_LOCKS_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=LockState.REPLICATING)
+                                                  create_constraint=True,
+                                                  values_callable=lambda obj: [e.value for e in obj]),
+                                             default=LockState.REPLICATING)
     length: Mapper[int] = mapped_column(BigInteger)
     bytes: Mapper[int] = mapped_column(BigInteger)
     accessed_at: Mapper[datetime] = mapped_column(DateTime)
@@ -1240,22 +1240,22 @@ class Request(BASE, ModelBase):
     __tablename__ = 'requests'
     id = Column(GUID(), default=utils.generate_uuid)
     request_type: Mapper[RequestType] = mapped_column(Enum(RequestType, name='REQUESTS_TYPE_CHK',
-                               create_constraint=True,
-                               values_callable=lambda obj: [e.value for e in obj]),
-                          default=RequestType.TRANSFER)
+                                                           create_constraint=True,
+                                                           values_callable=lambda obj: [e.value for e in obj]),
+                                                      default=RequestType.TRANSFER)
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='REQUESTS_DIDTYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]),
-                      default=DIDType.FILE)
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]),
+                                              default=DIDType.FILE)
     dest_rse_id = Column(GUID())
     source_rse_id = Column(GUID())
     attributes: Mapper[str] = mapped_column(String(4000))
     state: Mapper[RequestState] = mapped_column(Enum(RequestState, name='REQUESTS_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=RequestState.QUEUED)
+                                                     create_constraint=True,
+                                                     values_callable=lambda obj: [e.value for e in obj]),
+                                                default=RequestState.QUEUED)
     external_id: Mapper[str] = mapped_column(String(64))
     external_host: Mapper[str] = mapped_column(String(256))
     retry_count: Mapper[int] = mapped_column(Integer(), server_default='0')
@@ -1313,22 +1313,22 @@ class RequestHistory(BASE, ModelBase):
     __tablename__ = 'requests_history'
     id = Column(GUID(), default=utils.generate_uuid)
     request_type: Mapper[RequestType] = mapped_column(Enum(RequestType, name='REQUESTS_HIST_TYPE_CHK',
-                               create_constraint=True,
-                               values_callable=lambda obj: [e.value for e in obj]),
-                          default=RequestType.TRANSFER)
+                                                           create_constraint=True,
+                                                           values_callable=lambda obj: [e.value for e in obj]),
+                                                      default=RequestType.TRANSFER)
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='REQUESTS_HIST_DIDTYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]),
-                      default=DIDType.FILE)
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]),
+                                              default=DIDType.FILE)
     dest_rse_id = Column(GUID())
     source_rse_id = Column(GUID())
     attributes: Mapper[str] = mapped_column(String(4000))
     state: Mapper[RequestState] = mapped_column(Enum(RequestState, name='REQUESTS_HIST_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=RequestState.QUEUED)
+                                                     create_constraint=True,
+                                                     values_callable=lambda obj: [e.value for e in obj]),
+                                                default=RequestState.QUEUED)
     external_id: Mapper[str] = mapped_column(String(64))
     external_host: Mapper[str] = mapped_column(String(256))
     retry_count: Mapper[int] = mapped_column(Integer(), server_default='0')
@@ -1434,15 +1434,15 @@ class Subscription(BASE, ModelBase):
     replication_rules: Mapper[str] = mapped_column(String(4000))
     policyid: Mapper[int] = mapped_column(SmallInteger, server_default='0')
     state: Mapper[SubscriptionState] = mapped_column(Enum(SubscriptionState, name='SUBSCRIPTIONS_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=SubscriptionState.ACTIVE)
+                                                          create_constraint=True,
+                                                          values_callable=lambda obj: [e.value for e in obj]),
+                                                     default=SubscriptionState.ACTIVE)
     last_processed: Mapper[datetime] = mapped_column(DateTime, default=datetime.utcnow())
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     lifetime: Mapper[datetime] = mapped_column(DateTime)
     comments: Mapper[str] = mapped_column(String(4000))
     retroactive: Mapper[bool] = mapped_column(Boolean(name='SUBSCRIPTIONS_RETROACTIVE_CHK', create_constraint=True),
-                         default=False)
+                                              default=False)
     expired_at: Mapper[datetime] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('id', name='SUBSCRIPTIONS_PK'),
                    UniqueConstraint('name', 'account', name='SUBSCRIPTIONS_NAME_ACCOUNT_UQ'),
@@ -1461,15 +1461,15 @@ class SubscriptionHistory(BASE, ModelBase):
     replication_rules: Mapper[str] = mapped_column(String(4000))
     policyid: Mapper[int] = mapped_column(SmallInteger, server_default='0')
     state: Mapper[SubscriptionState] = mapped_column(Enum(SubscriptionState, name='SUBSCRIPTIONS_HIST_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]),
-                   default=SubscriptionState.ACTIVE)
+                                                          create_constraint=True,
+                                                          values_callable=lambda obj: [e.value for e in obj]),
+                                                     default=SubscriptionState.ACTIVE)
     last_processed: Mapper[datetime] = mapped_column(DateTime, default=datetime.utcnow())
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     lifetime: Mapper[datetime] = mapped_column(DateTime)
     comments: Mapper[str] = mapped_column(String(4000))
     retroactive: Mapper[bool] = mapped_column(Boolean(name='SUBS_HISTORY_RETROACTIVE_CHK', create_constraint=True),
-                         default=False)
+                                              default=False)
     expired_at: Mapper[datetime] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('id', 'updated_at', name='SUBSCRIPTIONS_PK'),)
 
@@ -1481,7 +1481,7 @@ class Token(BASE, ModelBase):
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     refresh_token: Mapper[str] = mapped_column(String(3072), default=None)
     refresh: Mapper[bool] = mapped_column(Boolean(name='TOKENS_REFRESH_CHK', create_constraint=True),
-                     default=False)
+                                          default=False)
     refresh_start: Mapper[datetime] = mapped_column(DateTime, default=None)
     refresh_expired_at: Mapper[datetime] = mapped_column(DateTime, default=None)
     refresh_lifetime: Mapper[int] = mapped_column(Integer())
@@ -1587,8 +1587,8 @@ class NamingConvention(BASE, ModelBase):
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     regexp: Mapper[str] = mapped_column(String(255))
     convention_type: Mapper[KeyType] = mapped_column(Enum(KeyType, name='CVT_TYPE_CHK',
-                                  create_constraint=True,
-                                  values_callable=lambda obj: [e.value for e in obj]))
+                                                          create_constraint=True,
+                                                          values_callable=lambda obj: [e.value for e in obj]))
     _table_args = (PrimaryKeyConstraint('scope', name='NAMING_CONVENTIONS_PK'),
                    ForeignKeyConstraint(['scope'], ['scopes.scope'], name='NAMING_CONVENTIONS_SCOPE_FK'))
 
@@ -1622,14 +1622,14 @@ class LifetimeExceptions(BASE, ModelBase):
     scope: Mapper[InternalScope] = mapped_column(InternalScopeString(get_schema_value('SCOPE_LENGTH')))
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='LIFETIME_EXCEPT_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     pattern: Mapper[str] = mapped_column(String(255))
     comments: Mapper[str] = mapped_column(String(4000))
     state: Mapper[LifetimeExceptionsState] = mapped_column(Enum(LifetimeExceptionsState, name='LIFETIME_EXCEPT_STATE_CHK',
-                        create_constraint=True,
-                        values_callable=lambda obj: [e.value for e in obj]))
+                                                                create_constraint=True,
+                                                                values_callable=lambda obj: [e.value for e in obj]))
     expires_at: Mapper[datetime] = mapped_column(DateTime)
     _table_args = (PrimaryKeyConstraint('id', 'scope', 'name', 'did_type', 'account', name='LIFETIME_EXCEPT_PK'),
                    CheckConstraint('SCOPE IS NOT NULL', name='LIFETIME_EXCEPT_SCOPE_NN'),
@@ -1654,8 +1654,8 @@ class DidsFollowed(BASE, ModelBase):
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='DIDS_FOLLOWED_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     _table_args = (PrimaryKeyConstraint('scope', 'name', 'account', name='DIDS_FOLLOWED_PK'),
                    CheckConstraint('SCOPE IS NOT NULL', name='DIDS_FOLLOWED_SCOPE_NN'),
                    CheckConstraint('NAME IS NOT NULL', name='DIDS_FOLLOWED_NAME_NN'),
@@ -1672,8 +1672,8 @@ class FollowEvents(BASE, ModelBase):
     name: Mapper[str] = mapped_column(String(get_schema_value('NAME_LENGTH')))
     account: Mapper[InternalAccount] = mapped_column(InternalAccountString(get_schema_value('ACCOUNT_LENGTH')))
     did_type: Mapper[DIDType] = mapped_column(Enum(DIDType, name='DIDS_FOLLOWED_EVENTS_TYPE_CHK',
-                           create_constraint=True,
-                           values_callable=lambda obj: [e.value for e in obj]))
+                                                   create_constraint=True,
+                                                   values_callable=lambda obj: [e.value for e in obj]))
     event_type: Mapper[str] = mapped_column(String(1024))
     payload: Mapper[str] = mapped_column(Text)
     _table_args = (PrimaryKeyConstraint('scope', 'name', 'account', name='DIDS_FOLLOWED_EVENTS_PK'),
