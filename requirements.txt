@@ -1,9 +1,9 @@
 # All dependencies needed to run rucio client (and server/daemons) should be defined here
 requests>=2.25.1,<=2.31.0                                   # Python HTTP for Humans.
 urllib3~=1.26.16                                            # HTTP library with thread-safe connection pooling, file post, etc.
-dogpile.cache~=1.2.1                                        # Caching API plugins (1.1.2 is the first version to support pymemcache)
+dogpile.cache~=1.2.2                                        # Caching API plugins (1.1.2 is the first version to support pymemcache)
 tabulate~=0.9.0                                             # Pretty-print tabular data
-jsonschema~=4.17.3                                          # For JSON schema validation (Policy modules)
+jsonschema~=4.18.4                                          # For JSON schema validation (Policy modules)
 
 # All dependencies needed in extras for rucio client (and server/daemons) should be defined here
 paramiko~=3.2.0                                             # ssh_extras; SSH2 protocol library (also needed in the server)
@@ -15,28 +15,28 @@ argcomplete~=3.1.1                                          # argcomplete_extras
 python-magic~=0.4.27                                        # dumper_extras; File type identification using libmagic
 
 # All dependencies needed to run rucio server/daemons should be defined here
-SQLAlchemy==2.0.17                                          # DB backend
+SQLAlchemy==2.0.19                                          # DB backend
 alembic~=1.11.1                                             # Lightweight database migration tool for SQLAlchemy
 pymemcache==4.0.0                                           # A comprehensive, fast, pure-Python memcached client (Used by Dogpile)
 python-dateutil==2.8.2                                      # Extensions to the standard datetime module
 stomp.py==8.1.0                                             # ActiveMQ Messaging Protocol
 statsd==4.0.1                                               # Needed to log into graphite with more than 1 Hz
 geoip2==4.7.0                                               # GeoIP2 API (for IPv6 support)
-google-auth==2.21.0                                         # Google authentication library for Python
+google-auth==2.22.0                                         # Google authentication library for Python
 redis==4.6.0                                                # Python client for Redis key-value store
 Flask==2.3.2                                                # Python web framework
 oic==1.6.1                                                  # for authentication via OpenID Connect protocol
-prometheus_client==0.17.0                                   # Python client for the Prometheus monitoring system
-boto3==1.27.0                                               # S3 boto protocol (new version)
+prometheus_client==0.17.1                                   # Python client for the Prometheus monitoring system
+boto3==1.28.5                                               # S3 boto protocol (new version)
 
 # All dependencies needed in extras for rucio server/daemons should be defined here
 cx_oracle==8.3.0                                            # oracle_extras
 psycopg2-binary==2.9.6                                      # postgresql_extras
 PyMySQL==1.1.0                                              # mysql_extras
-PyYAML==6.0                                                 # globus_extras and used for reading test configuration files
-globus-sdk==3.22.0                                          # globus_extras
+PyYAML==6.0.1                                               # globus_extras and used for reading test configuration files
+globus-sdk==3.24.0                                          # globus_extras
 python3-saml==1.15.0                                        # saml_extras
-pymongo==4.4.0                                              # pymongo (metadata plugin)
+pymongo==4.4.1                                              # pymongo (metadata plugin)
 
 # All dependencies needed to develop/test rucio should be defined here
 pytest==7.4.0
@@ -47,11 +47,10 @@ pycodestyle==2.10.0                                         # New package replac
 # https://github.com/pylint-dev/pylint/issues/8150
 # Was fixed recently, but wasn't included in a release yet.
 # TODO: upgrade to a released version
-pylint @ git+https://github.com/pylint-dev/pylint.git@f815e9f5fcdd5caffc04e335fc4590a65989ef21
-astroid @ git+https://github.com/pylint-dev/astroid.git@71f81ee958f07a398c09088488465d161df64602
-# pylint==3.0.0a7
-# astroid==3.0.0a7
-virtualenv==20.23.1                                         # Virtual Python Environment builder
+# pylint==3.0.0a8
+pylint @ git+https://github.com/pylint-dev/pylint.git@c4281bcff86b66fdf8518e7f57dc3405c8da3a4f
+astroid==3.0.0a8
+virtualenv==20.24.0                                         # Virtual Python Environment builder
 xmltodict==0.13.0                                           # Makes working with XML feel like you are working with JSON
 pytz==2023.3                                                # World timezone definitions, modern and historical
 pydoc-markdown~=4.8.2                                       # Used for generating Markdown documentation for docusaurus
