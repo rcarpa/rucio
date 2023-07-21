@@ -134,7 +134,7 @@ jobs:
         run: |
           EVENT="${{ github.event_name }}"
           if [ $EVENT != 'schedule' ]; then
-            echo "::set-output name=matrix::$(./tools/test/matrix_parser.py < ./etc/docker/test/matrix.yml)"
+            echo "::set-output name=matrix::$(./tools/test/matrix_parser.py < ./etc/docker/test/matrix_nightly.yml)"
           else
             echo "::set-output name=matrix::$(./tools/test/matrix_parser.py < ./etc/docker/test/matrix_nightly.yml)"
           fi
