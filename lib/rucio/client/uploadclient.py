@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 import copy
 import json
 import logging
@@ -30,7 +31,7 @@ from rucio.common.exception import (RucioException, RSEWriteBlocked, DataIdentif
                                     ResourceTemporaryUnavailable, ServiceUnavailable, InputValidationError, RSEChecksumUnavailable,
                                     ScopeNotFound)
 from rucio.common.utils import (adler32, detect_client_location, execute, generate_uuid, make_valid_did, md5, send_trace,
-                                retry, GLOBALLY_SUPPORTED_CHECKSUMS)
+                                retry, bittorrent_v2_merkle_sha256, GLOBALLY_SUPPORTED_CHECKSUMS)
 from rucio.rse import rsemanager as rsemgr
 
 
@@ -336,6 +337,17 @@ class UploadClient:
             raise NotAllFilesUploaded()
         return 0
 
+    def _add_bittorrent_meta(self, file, logger):
+        #return
+        pieces_root, pieces_layers, piece_length = bittorrent_v2_merkle_sha256(os.path.join(file['dirname'], file['basename']))
+        bittorrent_meta = {
+            'bittorrent_pieces_root': base64.b64encode(pieces_root).decode(),
+            'bittorrent_pieces_layers': base64.b64encode(pieces_layers).decode(),
+            'bittorrent_piece_length': piece_length,
+        }
+        self.client.set_metadata_bulk(scope=file['did_scope'], name=file['did_name'], meta=bittorrent_meta)
+        logger(logging.INFO, 'Added Bittorrent did meta')
+
     def _register_file(self, file, registered_dataset_dids, ignore_availability=False, activity=None):
         """
         Registers the given file in Rucio. Creates a dataset if
@@ -404,12 +416,14 @@ class UploadClient:
 
             # add file to rse if it is not registered yet
             replicastate = list(self.client.list_replicas([file_did], all_states=True))
+            self._add_bittorrent_meta(file=file, logger=logger)
             if rse not in replicastate[0]['rses']:
                 self.client.add_replicas(rse=rse, files=[replica_for_api])
                 logger(logging.INFO, 'Successfully added replica in Rucio catalogue at %s' % rse)
         except DataIdentifierNotFound:
             logger(logging.DEBUG, 'File DID does not exist')
             self.client.add_replicas(rse=rse, files=[replica_for_api])
+            self._add_bittorrent_meta(file=file, logger=logger)
             logger(logging.INFO, 'Successfully added replica in Rucio catalogue at %s' % rse)
             if not dataset_did_str:
                 # only need to add rules for files if no dataset is given

@@ -45,14 +45,15 @@ from rucio.db.sqla import models
 from rucio.db.sqla.constants import DIDType, RequestState, RequestType, TransferLimitDirection
 from rucio.db.sqla.session import read_session, transactional_session, stream_session
 from rucio.rse import rsemanager as rsemgr
-from rucio.transfertool.transfertool import TransferStatusReport
+from rucio.transfertool.transfertool import TransferStatusReport, Transfertool
+from rucio.transfertool.bittorrent import BittorrentTransfertool
 from rucio.transfertool.fts3 import FTS3Transfertool
 from rucio.transfertool.globus import GlobusTransferTool
 from rucio.transfertool.mock import MockTransfertool
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Iterable, Mapping, Sequence
-    from typing import Any, Optional
+    from typing import Any, Optional, Type
     from sqlalchemy.orm import Session
     from rucio.common.types import InternalAccount
     from rucio.core.topology import Topology
@@ -72,10 +73,11 @@ WEBDAV_TRANSFER_MODE = config_get('conveyor', 'webdav_transfer_mode', False, Non
 
 DEFAULT_MULTIHOP_TOMBSTONE_DELAY = int(datetime.timedelta(hours=2).total_seconds())
 
-TRANSFERTOOL_CLASSES_BY_NAME = {
+TRANSFERTOOL_CLASSES_BY_NAME: "dict[str, Type[Transfertool]]" = {
     FTS3Transfertool.external_name: FTS3Transfertool,
     GlobusTransferTool.external_name: GlobusTransferTool,
     MockTransfertool.external_name: MockTransfertool,
+    BittorrentTransfertool.external_name: BittorrentTransfertool,
 }
 
 
@@ -870,7 +872,7 @@ class TransferPathBuilder:
                 sources=candidate_sources,
                 max_sources=self.max_sources,
                 multi_source_sources=[] if self.preparer_mode else sources,
-                limit_dest_schemes=[],
+                limit_dest_schemes=transfer_schemes,
                 operation_src='third_party_copy_read',
                 operation_dest='third_party_copy_write',
                 domain='wan',
@@ -1393,7 +1395,7 @@ def prepare_transfers(
             logger(logging.WARNING, '%s: all available sources were filtered', rws)
             continue
 
-        update_dict: dict[Any, Any] = {
+        update_dict: "dict[Any, Any]" = {
             models.Request.state.name: _throttler_request_state(
                 activity=rws.activity,
                 source_rse=selected_source.rse,

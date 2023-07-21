@@ -188,6 +188,14 @@ class Transfertool(object, metaclass=ABCMeta):
         """
         pass
 
+    def bulk_query(self, requests_by_eid, timeout=None):
+        """
+        Query the status of transfers in the transfertool.
+
+        :param requests_by_eid: dictionary {external_id1: {request_id1: request1, ...}, ...} of request to be queried
+        :returns: Transfer status information as a dictionary with the same format.
+        """
+
     @abstractmethod
     def cancel(self, transfer_ids, timeout=None):
         """

@@ -42,15 +42,27 @@ rucio-admin rse add XRD4
 rucio-admin rse add SSH1
 
 # Add the protocol definitions for the storage servers
-rucio-admin rse add-protocol --hostname xrd1 --scheme root --prefix //rucio --port 1094 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD1
+rucio-admin rse add-protocol --hostname xrd1 --scheme root --prefix //rucio --port 1094 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 2}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD1
 rucio-admin rse add-protocol --hostname xrd2 --scheme root --prefix //rucio --port 1095 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD2
 rucio-admin rse add-protocol --hostname xrd3 --scheme root --prefix //rucio --port 1096 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD3
 rucio-admin rse add-protocol --hostname xrd4 --scheme root --prefix //rucio --port 1097 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD4
+rucio-admin rse add-protocol --hostname xrd1 --scheme magnet --prefix //rucio --port 10000 --impl rucio.rse.protocols.bittorrent.Default --domain-json '{"wan": {"read": 0, "write": 0, "delete": 0, "third_party_copy_read": 2, "third_party_copy_write": 2}, "lan": {"read": 0, "write": 0, "delete": 0}}' XRD1
+rucio-admin rse add-protocol --hostname xrd2 --scheme magnet --prefix //rucio --port 10000 --impl rucio.rse.protocols.bittorrent.Default --domain-json '{"wan": {"read": 0, "write": 0, "delete": 0, "third_party_copy_read": 2, "third_party_copy_write": 2}, "lan": {"read": 0, "write": 0, "delete": 0}}' XRD2
+rucio-admin rse add-protocol --hostname xrd3 --scheme magnet --prefix //rucio --port 10000 --impl rucio.rse.protocols.bittorrent.Default --domain-json '{"wan": {"read": 0, "write": 0, "delete": 0, "third_party_copy_read": 2, "third_party_copy_write": 2}, "lan": {"read": 0, "write": 0, "delete": 0}}' XRD3
+rucio-admin rse add-protocol --hostname xrd4 --scheme magnet --prefix //rucio --port 10000 --impl rucio.rse.protocols.bittorrent.Default --domain-json '{"wan": {"read": 0, "write": 0, "delete": 0, "third_party_copy_read": 2, "third_party_copy_write": 2}, "lan": {"read": 0, "write": 0, "delete": 0}}' XRD4
 rucio-admin rse add-protocol --hostname ssh1 --scheme scp --prefix /rucio --port 22 --impl rucio.rse.protocols.ssh.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' SSH1
 rucio-admin rse add-protocol --hostname ssh1 --scheme rsync --prefix /rucio --port 22 --impl rucio.rse.protocols.ssh.Rsync --domain-json '{"wan": {"read": 2, "write": 2, "delete": 2, "third_party_copy_read": 2, "third_party_copy_write": 2}, "lan": {"read": 2, "write": 2, "delete": 2}}' SSH1
 rucio-admin rse add-protocol --hostname ssh1 --scheme rclone --prefix /rucio --port 22 --impl rucio.rse.protocols.rclone.Default --domain-json '{"wan": {"read": 3, "write": 3, "delete": 3, "third_party_copy_read": 3, "third_party_copy_write": 3}, "lan": {"read": 3, "write": 3, "delete": 3}}' SSH1
 
 # Set test_container_xrd attribute for xrd containers
+rucio-admin rse set-attribute --rse XRD1 --key deluge_management_address --value xrd1:58846
+rucio-admin rse set-attribute --rse XRD2 --key deluge_management_address --value xrd2:58846
+rucio-admin rse set-attribute --rse XRD3 --key deluge_management_address --value xrd3:58846
+rucio-admin rse set-attribute --rse XRD4 --key deluge_management_address --value xrd4:58846
+rucio-admin rse set-attribute --rse XRD1 --key qbittorrent_management_address --value xrd1:8080
+rucio-admin rse set-attribute --rse XRD2 --key qbittorrent_management_address --value xrd2:8080
+rucio-admin rse set-attribute --rse XRD3 --key qbittorrent_management_address --value xrd3:8080
+rucio-admin rse set-attribute --rse XRD4 --key qbittorrent_management_address --value xrd4:8080
 rucio-admin rse set-attribute --rse XRD1 --key test_container_xrd --value True
 rucio-admin rse set-attribute --rse XRD2 --key test_container_xrd --value True
 rucio-admin rse set-attribute --rse XRD3 --key test_container_xrd --value True
