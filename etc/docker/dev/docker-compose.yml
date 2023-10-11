@@ -72,6 +72,8 @@ services:
     image: docker.io/elasticsearch:7.4.0
     environment:
       - discovery.type=single-node
+  memcached:
+    image: docker.io/memcached
   activemq:
     image: docker.io/webcenter/activemq:latest
     environment:
