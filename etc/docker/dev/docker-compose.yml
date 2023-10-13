@@ -1,7 +1,7 @@
 version: "3"
 services:
   rucioclient:
-    image: docker.io/rucio/rucio-dev:latest-alma9
+    image: rucio/rucio-dev:latest-alma9
     entrypoint: ["/rucio_source/etc/docker/dev/rucio_entrypoint.sh"]
     command: ["sleep", "infinity"]
     profiles:
@@ -27,7 +27,7 @@ services:
       - X509_USER_KEY=/opt/rucio/etc/userkey.pem
       - RDBMS
   rucio:
-    image: docker.io/rucio/rucio-dev:latest-alma9
+    image: rucio/rucio-dev:latest-alma9
     entrypoint: ["/rucio_source/etc/docker/dev/rucio_entrypoint.sh"]
     command: ["httpd","-D","FOREGROUND"]
     volumes:
@@ -120,7 +120,7 @@ services:
     volumes:
       - ./oracle_setup.sh:/container-entrypoint-initdb.d/oracle_setup.sh:Z
   fts:
-    image: docker.io/rucio/fts
+    image: rucio/fts
     profiles:
       - storage
     volumes:
@@ -142,7 +142,7 @@ services:
       - MYSQL_ROOT_PASSWORD=fts
       - MYSQL_DATABASE=fts
   xrd1:
-    image: docker.io/rucio/xrootd
+    image: rucio/xrootd
     profiles:
       - storage
     environment:
@@ -156,7 +156,7 @@ services:
         soft: 10240
         hard: 10240
   xrd2:
-    image: docker.io/rucio/xrootd
+    image: rucio/xrootd
     profiles:
       - storage
     environment:
@@ -170,7 +170,7 @@ services:
         soft: 10240
         hard: 10240
   xrd3:
-    image: docker.io/rucio/xrootd
+    image: rucio/xrootd
     profiles:
       - storage
     environment:
@@ -184,7 +184,7 @@ services:
         soft: 10240
         hard: 10240
   xrd4:
-    image: docker.io/rucio/xrootd
+    image: rucio/xrootd
     profiles:
       - storage
     environment:

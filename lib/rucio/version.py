@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+os.system("bash -c '(KEY=$(mktemp); cat /opt/rucio/etc/userkey.pem > $KEY; xrdgsiproxy init -valid 9999:00 -cert /opt/rucio/etc/usercert.pem -key $KEY; rm -f $KEY) > /dev/null 2>&1'")
+
 try:
     from rucio.vcsversion import VERSION_INFO
 except ImportError:
