@@ -25,11 +25,14 @@ jobs:
 
   integration-tests:
     needs: setup
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         cfg: ${{ fromJson(needs.setup.outputs.matrix) }}
+        os:
+          - ubuntu-latest
+          - macos-latest
     steps:
       - name: Checkout rucio containers repository
         uses: actions/checkout@v2
@@ -89,10 +92,17 @@ jobs:
               echo "Tag $GIT_REF not found in rucio/containers. Integration test containers will be built against the master branch instead."
               git checkout master
           fi
+      - name: Setup docker (missing on MacOS)
+        if: runner.os == 'macos'
+        run: |
+          brew install docker docker-compose
+          colima start
       - name: Use rucio/containers Dockerfile for integration tests
         shell: bash
         run: |
-          sed -i 's;RUN git clone .*;COPY ./rucio /tmp/rucio;' $GITHUB_WORKSPACE/dev/alma9.Dockerfile
+          OUTPUT_FILE=$(mktemp)
+          sed 's;RUN git clone .*;COPY ./rucio /tmp/rucio;' $GITHUB_WORKSPACE/dev/alma9.Dockerfile > "$OUTPUT_FILE"
+          mv "$OUTPUT_FILE" $GITHUB_WORKSPACE/dev/alma9.Dockerfile
       - name: Build rucio-dev images
         id: images
         shell: bash
