@@ -16,6 +16,7 @@
 import datetime
 import logging
 import operator
+import random
 import re
 import sys
 import time
@@ -1092,6 +1093,99 @@ class SkipIntermediateTape(PathDistance):
             return SKIP_SOURCE
 
 
+class PathCapacity(SourceRankingStrategy):
+    """
+    Order sources depending on the capacity of the path towards the destination.
+    (minimum capacity of an edge along the path).
+
+    The assigned cost is probabilistic: a higher capacity doesn't guarantee that the
+    source will allways have the best (lower) cost. It only increases the probability that the
+    source will have a better cost.
+    """
+
+    class _RankingContext(RequestRankingContext):
+        def __init__(
+                self,
+                strategy: "PathCapacity",
+                rws: "RequestWithSources",
+                costs: "Mapping[RseData, int]",
+        ):
+            super().__init__(strategy, rws)
+            self.costs = costs
+
+    def __init__(self, transfer_path_builder: TransferPathBuilder, topology: "Topology", session: "Session"):
+        super().__init__()
+        self.transfer_path_builder = transfer_path_builder
+        topology.load_capacities(session=session)
+        self.topology = topology
+
+    def for_request(
+            self,
+            rws: RequestWithSources,
+            sources: "Iterable[RequestSource]",
+            *,
+            logger: "LoggerFunction" = logging.log,
+            session: "Session"
+    ) -> "RequestRankingContext":
+        paths_for_rws = self.transfer_path_builder.build_or_return_cached(rws, sources, logger=logger, session=session)
+        sources = list(sources)
+
+        capacity_by_rse = {}
+        total_capacity = 0
+        for source in sources:
+            path_capacity = None
+            for hop in paths_for_rws.get(source.rse, []):
+                edge = self.topology.edge(hop.src.rse, hop.dst.rse)
+                if not edge:
+                    logger(logging.WARNING, '%s: Missing edge when computing path capacity', rws.request_id)
+                    path_capacity = None
+                    break
+
+                path_capacity = min(
+                    edge.capacity,
+                    path_capacity if path_capacity is not None else edge.capacity
+                )
+            capacity_by_rse[source.rse] = path_capacity or 0
+
+            if path_capacity is not None:
+                total_capacity += path_capacity
+
+        costs = defaultdict(lambda: 0)
+        if not total_capacity:
+            return PathCapacity._RankingContext(self, rws, costs)
+
+        target_ratio = 1 / len(sources)
+        for src_rse, capacity in capacity_by_rse.items():
+            ratio = capacity / total_capacity
+
+            if ratio <= target_ratio:
+                probability = 0.5 * ratio / target_ratio
+            else:
+                probability = 0.5 + 0.5 * ((ratio - target_ratio) / (1 - target_ratio))
+
+            rand_val = random.random()
+
+            if probability < 0.5 and rand_val < 0.05:
+                # Even the worst source should sometimes be selected. Otherwise, sources
+                # which are assumed bad will stay forever unused. In 5% of cases, give it
+                # a chance to prove that it improved by artificially improving its cost.
+                cost_base = 3
+            elif probability < rand_val:
+                cost_base = 2
+            else:
+                cost_base = 1
+
+            # Embed the ration into the lower digits of the cost. For two reasons:
+            # - the cost is logged, so this is useful for administrative / debugging reasons
+            # - if multiple paths are selected, give priority to the one which has better capacity
+            costs[src_rse] = - (cost_base * 1000 + int(100 * ratio))
+        return PathCapacity._RankingContext(self, rws, costs)
+
+    def apply(self, ctx: RequestRankingContext, source: RequestSource) -> "Optional[int | _SkipSource]":
+        ctx = cast(PathCapacity._RankingContext, ctx)
+        return ctx.costs[source.rse]
+
+
 @transactional_session
 def build_transfer_paths(
         topology: "Topology",
@@ -1140,6 +1234,7 @@ def build_transfer_paths(
         PreferDiskOverTape.external_name: lambda: PreferDiskOverTape(),
         PathDistance.external_name: lambda: PathDistance(transfer_path_builder=transfer_path_builder),
         PreferSingleHop.external_name: lambda: PreferSingleHop(transfer_path_builder=transfer_path_builder),
+        PathCapacity.external_name: lambda: PathCapacity(transfer_path_builder=transfer_path_builder, topology=topology, session=session),
     }
 
     default_strategies = [

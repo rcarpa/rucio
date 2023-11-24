@@ -27,6 +27,7 @@ from sqlalchemy import and_, select
 from rucio.common.config import config_get_int, config_get
 from rucio.common.exception import NoDistance, RSEProtocolNotSupported, InvalidRSEExpression
 from rucio.common.utils import PriorityQueue
+from rucio.core.request import TransferStatsManager
 from rucio.core.rse import RseCollection, RseData
 from rucio.core.rse_expression_parser import parse_expression
 from rucio.db.sqla import models
@@ -49,6 +50,10 @@ if TYPE_CHECKING:
             ...
 
         @property
+        def capacity(self) -> _Number:
+            ...
+
+        @property
         def enabled(self) -> bool:
             ...
 
@@ -57,6 +62,9 @@ if TYPE_CHECKING:
 
 
 DEFAULT_HOP_PENALTY = 10
+DEFAULT_EDGE_CAPACITY = int((10 ** 7) * datetime.timedelta(days=1).total_seconds() / 8)  # Bytes transferred in a day at 10 Mbps
+DEFAULT_NODE_CAPACITY = 10 ** 12 - 1  # Just bellow 1 Terabyte
+
 INF = float('inf')
 
 
@@ -68,6 +76,7 @@ class Node(RseData):
         self.out_edges = weakref.WeakKeyDictionary()
 
         self.cost: _Number = 0
+        self.capacity = DEFAULT_NODE_CAPACITY
         self.enabled: bool = True
         self.used_for_multihop = False
 
@@ -78,7 +87,10 @@ class Edge(Generic[TN]):
         self._dst_node = weakref.ref(dst_node)
 
         self.cost: _Number = 1
+        self.capacity = DEFAULT_EDGE_CAPACITY
         self.enabled: bool = True
+
+        self.__hash = None
 
         self.add_to_nodes()
 
@@ -112,7 +124,12 @@ class Edge(Generic[TN]):
         return self._src_node == other._src_node and self._dst_node == other._dst_node
 
     def __str__(self):
-        return f'{self._src_node}-->{self._dst_node}'
+        return f'{self.src_node}-->{self.dst_node}'
+
+    def __hash__(self):
+        if self.__hash is None:
+            self.__hash = hash((self.src_node, self.dst_node))
+        return self.__hash
 
 
 class Topology(RseCollection, Generic[TN, TE]):
@@ -420,6 +437,52 @@ class Topology(RseCollection, Generic[TN, TE]):
                             adj_node_state = node_state_provider(adjacent_node)
                             next_hops[adjacent_node] = new_adjacent_dist, adj_node_state, edge, edge_state
                             priority_q[adjacent_node] = new_adjacent_dist
+
+    @read_session
+    def load_capacities(self, *, session: "Session") -> None:
+        with self._lock:
+            nodes_by_id = copy.copy(self.rse_id_to_data_map)
+
+        self.ensure_loaded(rse_ids=nodes_by_id, load_attributes=True, load_usage=True, session=session)
+
+        for node in nodes_by_id.values():
+            # TODO: this attribute is ATLAS specific
+            capacity = node.attributes.get('freespace')
+            if capacity is not None:
+                try:
+                    capacity = Decimal(capacity) * (10 ** 12)  # Convert terabytes to Bytes
+                except ValueError:
+                    pass
+            else:
+                for usage in node.usage:
+                    if usage['free']:
+                        if capacity is None:
+                            capacity = usage['free']
+                        else:
+                            capacity = min(capacity, usage['free'])
+            node.capacity = capacity if capacity is not None else DEFAULT_NODE_CAPACITY
+
+        for edge in self.edges.values():
+            edge.capacity = DEFAULT_EDGE_CAPACITY
+
+        db_stats = TransferStatsManager().load_totals(
+            older_t=datetime.datetime.utcnow() - datetime.timedelta(hours=24),
+            by_activity=False,
+            session=session,
+        )
+        for stat in db_stats:
+            dst_node = self.get(stat['dest_rse_id'])
+            if not dst_node:
+                continue
+            src_node = self.get(stat['src_rse_id'])
+            if not src_node:
+                continue
+
+            edge = self.edge(src_node, dst_node)
+            if not edge:
+                continue
+
+            edge.capacity += stat['bytes_done']
 
 
 class ExpiringObjectCache:
