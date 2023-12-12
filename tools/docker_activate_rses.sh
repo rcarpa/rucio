@@ -30,6 +30,14 @@ echo "Creating RSEs"
 # | XRD3 |       | XRD4 |
 # |      |<----->|      |
 # +------+   2   +------+
+#    ^
+#    | 1
+#    v
+# +------+
+# |      |
+# | DAV1 |
+# |      |
+# +------+
 
 # Step zero, get a compliant proxy. The key must NOT be group/other readable
 (KEY=$(mktemp); cat /opt/rucio/etc/userkey.pem > "$KEY"; xrdgsiproxy init -valid 9999:00 -cert /opt/rucio/etc/usercert.pem -key "$KEY"; rm -f "$KEY")
@@ -43,9 +51,9 @@ rucio-admin rse add SSH1
 
 # Add the protocol definitions for the storage servers
 rucio-admin rse add-protocol --hostname xrd1 --scheme root --prefix //rucio --port 1094 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 2}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD1
-rucio-admin rse add-protocol --hostname xrd2 --scheme root --prefix //rucio --port 1095 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD2
-rucio-admin rse add-protocol --hostname xrd3 --scheme root --prefix //rucio --port 1096 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD3
-rucio-admin rse add-protocol --hostname xrd4 --scheme root --prefix //rucio --port 1097 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD4
+rucio-admin rse add-protocol --hostname xrd2 --scheme root --prefix //rucio --port 1094 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD2
+rucio-admin rse add-protocol --hostname xrd3 --scheme root --prefix //rucio --port 1094 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD3
+rucio-admin rse add-protocol --hostname xrd4 --scheme root --prefix //rucio --port 1094 --impl rucio.rse.protocols.xrootd.Default --domain-json '{"wan": {"read": 1, "write": 1, "delete": 1, "third_party_copy_read": 1, "third_party_copy_write": 1}, "lan": {"read": 1, "write": 1, "delete": 1}}' XRD4
 rucio-admin rse add-protocol --hostname xrd1 --scheme magnet --prefix //rucio --port 10000 --impl rucio.rse.protocols.bittorrent.Default --domain-json '{"wan": {"read": 0, "write": 0, "delete": 0, "third_party_copy_read": 2, "third_party_copy_write": 2}, "lan": {"read": 0, "write": 0, "delete": 0}}' XRD1
 rucio-admin rse add-protocol --hostname xrd2 --scheme magnet --prefix //rucio --port 10000 --impl rucio.rse.protocols.bittorrent.Default --domain-json '{"wan": {"read": 0, "write": 0, "delete": 0, "third_party_copy_read": 2, "third_party_copy_write": 2}, "lan": {"read": 0, "write": 0, "delete": 0}}' XRD2
 rucio-admin rse add-protocol --hostname xrd3 --scheme magnet --prefix //rucio --port 10000 --impl rucio.rse.protocols.bittorrent.Default --domain-json '{"wan": {"read": 0, "write": 0, "delete": 0, "third_party_copy_read": 2, "third_party_copy_write": 2}, "lan": {"read": 0, "write": 0, "delete": 0}}' XRD3
@@ -68,12 +76,14 @@ rucio-admin rse set-attribute --rse XRD2 --key test_container_xrd --value True
 rucio-admin rse set-attribute --rse XRD3 --key test_container_xrd --value True
 rucio-admin rse set-attribute --rse XRD4 --key test_container_xrd --value True
 rucio-admin rse set-attribute --rse SSH1 --key test_container_ssh --value True
+rucio-admin rse set-attribute --rse XRD3 --key oidc_support --value True
+rucio-admin rse set-attribute --rse XRD4 --key oidc_support --value True
 
 # Workaround, xrootd.py#connect returns with Auth Failed due to execution of the command in subprocess
 XrdSecPROTOCOL=gsi XRD_REQUESTTIMEOUT=10 XrdSecGSISRVNAMES=xrd1 xrdfs xrd1:1094 query config xrd1:1094
-XrdSecPROTOCOL=gsi XRD_REQUESTTIMEOUT=10 XrdSecGSISRVNAMES=xrd2 xrdfs xrd2:1095 query config xrd2:1095
-XrdSecPROTOCOL=gsi XRD_REQUESTTIMEOUT=10 XrdSecGSISRVNAMES=xrd3 xrdfs xrd3:1096 query config xrd3:1096
-XrdSecPROTOCOL=gsi XRD_REQUESTTIMEOUT=10 XrdSecGSISRVNAMES=xrd4 xrdfs xrd4:1097 query config xrd4:1097
+XrdSecPROTOCOL=gsi XRD_REQUESTTIMEOUT=10 XrdSecGSISRVNAMES=xrd2 xrdfs xrd2:1094 query config xrd2:1094
+XrdSecPROTOCOL=gsi XRD_REQUESTTIMEOUT=10 XrdSecGSISRVNAMES=xrd3 xrdfs xrd3:1094 query config xrd3:1094
+XrdSecPROTOCOL=gsi XRD_REQUESTTIMEOUT=10 XrdSecGSISRVNAMES=xrd4 xrdfs xrd4:1094 query config xrd4:1094
 
 # Enable FTS
 rucio-admin rse set-attribute --rse XRD1 --key fts --value https://fts:8446

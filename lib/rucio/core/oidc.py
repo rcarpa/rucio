@@ -139,6 +139,7 @@ def request_token(audience: str, scope: str, use_cache: bool = True) -> Optional
 
     try:
         response = requests.post(url=OIDC_PROVIDER_ENDPOINT,
+                                 verify=False,
                                  auth=(OIDC_CLIENT_ID, OIDC_CLIENT_SECRET),
                                  data={'grant_type': 'client_credentials',
                                        'audience': audience,
@@ -146,7 +147,7 @@ def request_token(audience: str, scope: str, use_cache: bool = True) -> Optional
         response.raise_for_status()
         payload = response.json()
         token = payload['access_token']
-    except Exception:
+    except Exception as e:
         logging.debug('Failed to procure a token', exc_info=True)
         return None
 

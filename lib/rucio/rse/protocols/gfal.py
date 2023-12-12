@@ -182,6 +182,7 @@ class Default(protocol.RSEProtocol):
             gfal2.set_verbose(gfal2.verbose_level.verbose)
         else:
             gfal2.set_verbose(gfal2.verbose_level.warning)
+        gfal2.set_verbose(gfal2.verbose_level.trace)
 
         self.__ctx = gfal2.creat_context()  # pylint: disable=no-member
         self.__ctx.set_opt_string_list("SRM PLUGIN", "TURL_PROTOCOLS", ["gsiftp", "rfio", "gsidcap", "dcap", "kdcap"])
