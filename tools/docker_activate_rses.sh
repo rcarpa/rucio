@@ -56,6 +56,7 @@ rucio-admin rse set-attribute --rse XRD2 --key test_container_xrd --value True
 rucio-admin rse set-attribute --rse XRD3 --key test_container_xrd --value True
 rucio-admin rse set-attribute --rse XRD4 --key test_container_xrd --value True
 rucio-admin rse set-attribute --rse SSH1 --key test_container_ssh --value True
+rucio-admin rse set-attribute --rse XRD4 --key oidc_support --value True
 
 # Workaround, xrootd.py#connect returns with Auth Failed due to execution of the command in subprocess
 XrdSecPROTOCOL=gsi XRD_REQUESTTIMEOUT=10 XrdSecGSISRVNAMES=xrd1 xrdfs xrd1:1094 query config xrd1:1094

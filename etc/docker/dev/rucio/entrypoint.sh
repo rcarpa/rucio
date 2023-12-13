@@ -30,6 +30,14 @@ generate_rucio_cfg(){
         -d "$destination"
 }
 
+if [ -f /tmp/usercert.pem ]; then
+    cp /tmp/usercert.pem "$RUCIO_HOME/etc/"
+fi
+if [ -f /tmp/userkey.pem ]; then
+    cp /tmp/userkey.pem "$RUCIO_HOME/etc/"
+    chmod og-rwx "$RUCIO_HOME/etc/userkey.pem"
+fi
+
 echo "Generating alembic.ini and rucio.cfg"
 
 if [ -z "$RDBMS" ]; then
