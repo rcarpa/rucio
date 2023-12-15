@@ -121,6 +121,11 @@ def _token_cache_set(key: str, value: str) -> None:
     """Store a token in the cache."""
     REGION.set(key, value)
 
+def fix_base64_padding(data):
+    missing_padding = len(data) % 4
+    if missing_padding != 0:
+        data += '=' * (4 - missing_padding)
+    return data
 
 def request_token(audience: str, scope: str, use_cache: bool = True) -> Optional[str]:
     """Request a token from the provider.
@@ -138,16 +143,27 @@ def request_token(audience: str, scope: str, use_cache: bool = True) -> Optional
         return token
 
     try:
-        response = requests.post(url=OIDC_PROVIDER_ENDPOINT,
-                                 verify=False,
-                                 auth=(OIDC_CLIENT_ID, OIDC_CLIENT_SECRET),
-                                 data={'grant_type': 'client_credentials',
-                                       'audience': audience,
-                                       'scope': scope})
-        response.raise_for_status()
-        payload = response.json()
-        token = payload['access_token']
-    except Exception:
+        response_1 = requests.post(url=OIDC_PROVIDER_ENDPOINT,
+                                   verify=False,
+                                   auth=(OIDC_CLIENT_ID, OIDC_CLIENT_SECRET),
+                                   data={'grant_type': 'client_credentials'})
+        import base64
+        response_1.raise_for_status()
+        response_1_payload = response_1.json()
+        token_1 = response_1_payload['access_token']
+
+        response_2 = requests.post(url=OIDC_PROVIDER_ENDPOINT,
+                                   verify=False,
+                                   auth=(OIDC_CLIENT_ID, OIDC_CLIENT_SECRET),
+                                   data={'grant_type': 'urn:ietf:params:oauth:grant-type:token-exchange',
+                                         'subject_token': token_1,
+                                         'subject_token_type': 'urn:ietf:params:oauth:token-type:access_token',
+                                         'audience': audience,
+                                         'scope': scope})
+        response_2.raise_for_status()
+        response_2_payload = response_2.json()
+        token = response_2_payload['access_token']
+    except Exception as e:
         logging.debug('Failed to procure a token', exc_info=True)
         return None
 

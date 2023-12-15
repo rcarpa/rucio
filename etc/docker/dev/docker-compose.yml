@@ -276,6 +276,8 @@ services:
       - ./iam/indigoiam_nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - indigoiam-login-service
+    ports:
+      - "127.0.0.1:443:443"
   indigoiam-login-service:
     image: indigoiam/iam-login-service:v1.8.2p2
     profiles:
@@ -312,7 +314,7 @@ services:
         condition: service_healthy
   keycloak:
     image: quay.io/keycloak/keycloak:23.0.1
-    command: start-dev --features=token-exchange --db mariadb --db-url-host iam-db --db-username keycloak --db-password secret --https-certificate-file=/cert.pem --https-certificate-key-file=/key.pem
+    command: start-dev --features=token-exchange,admin-fine-grained-authz,dynamic-scopes --db mariadb --db-url-host iam-db --db-username keycloak --db-password secret --https-certificate-file=/cert.pem --https-certificate-key-file=/key.pem
     profiles:
       - iam
     environment:
@@ -325,3 +327,5 @@ services:
     depends_on:
       iam-db:
         condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"

@@ -1857,7 +1857,7 @@ def determine_audience_for_rse(rse_id: str) -> str:
     # that the protocol hostname be sufficient, but this may not come to pass.
     filtered_hostnames = {p['hostname']
                           for p in rse_protocols['protocols']
-                          if p['scheme'] == 'davs'}
+                          if p['scheme'] in ('davs', 'root')}
     return ' '.join(sorted(filtered_hostnames))
 
 
@@ -1873,8 +1873,8 @@ def determine_scope_for_rse(
     filtered_prefixes = set()
     for protocol in rse_protocols['protocols']:
         # Token support is exclusive to WebDAV.
-        if protocol['scheme'] != 'davs':
-            continue
+        #if protocol['scheme'] != 'davs':
+        #    continue
         # Remove base path from prefix.  Storages typically map an issuer (i.e.
         # a VO) to a particular area.  If so, then the path to that area acts as
         # a base which should be removed from the prefix (in order for '/' to

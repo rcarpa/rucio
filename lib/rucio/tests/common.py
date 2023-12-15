@@ -29,7 +29,9 @@ import requests
 from rucio.common.config import config_get, config_get_bool, get_config_dirs
 from rucio.common.utils import generate_uuid as uuid, execute
 
-skip_rse_tests_with_accounts = pytest.mark.skipif(not any(os.path.exists(os.path.join(d, 'rse-accounts.cfg')) for d in get_config_dirs()),
+import os
+os.system("bash -c '(KEY=$(mktemp); cat /opt/rucio/etc/userkey.pem > $KEY; xrdgsiproxy init -valid 9999:00 -cert /opt/rucio/etc/usercert.pem -key $KEY; rm -f $KEY) > /dev/null 2>&1'")
+skip_rse_tests_with_accounts = pytest.mark.skipif(not any(os.path.exists(os.path.join(d, 'rse-accounts.cfg.template')) for d in get_config_dirs()),
                                                   reason='fails if no rse-accounts.cfg found')
 skiplimitedsql = pytest.mark.skipif('RDBMS' in os.environ and os.environ['RDBMS'] == 'sqlite',
                                     reason="does not work in SQLite because of missing features")
