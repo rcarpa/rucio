@@ -81,7 +81,8 @@ CREATE TABLE `ASSOCIATED_POLICY` (
 LOCK TABLES `ASSOCIATED_POLICY` WRITE;
 /*!40000 ALTER TABLE `ASSOCIATED_POLICY` DISABLE KEYS */;
 INSERT INTO `ASSOCIATED_POLICY` VALUES
-('71dd1617-3f3b-41d1-8ea7-a2a9f48e5d12','cd2e5ea5-10ef-4aed-8871-a8d31296c40b');
+('71dd1617-3f3b-41d1-8ea7-a2a9f48e5d12','cd2e5ea5-10ef-4aed-8871-a8d31296c40b'),
+('ef70cf4a-cf36-4fcf-90e0-6a73eef7cf8a','a53eb10e-0623-4586-a482-7a41666a4c68');
 /*!40000 ALTER TABLE `ASSOCIATED_POLICY` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -407,6 +408,7 @@ LOCK TABLES `CLIENT` WRITE;
 /*!40000 ALTER TABLE `CLIENT` DISABLE KEYS */;
 INSERT INTO `CLIENT` VALUES
 ('2f7d86a0-e8ba-4b75-9009-2048c5611177','','\0','account-console',0,'',NULL,'/realms/master/account/','\0',NULL,'\0','61c254e2-095d-42b9-b8cc-4546b124e548','openid-connect',0,'\0','\0','${client_account-console}','\0','client-secret','${authBaseUrl}',NULL,NULL,'','\0','\0','\0'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','','','xrd4',0,'',NULL,'','\0','','\0','139c1488-d000-4061-922b-0c0b518a57db','openid-connect',-1,'','\0','','\0','client-secret','','',NULL,'','\0','','\0'),
 ('53ef6db9-271e-46c5-bd72-2f12ea045014','','','rucio',0,'\0','DzmZKUfTsGz9bynGIp1gSwI5xen5ce8b','','\0','','\0','139c1488-d000-4061-922b-0c0b518a57db','openid-connect',-1,'','\0','','','client-secret','','',NULL,'','\0','','\0'),
 ('6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6','','\0','realm-management',0,'\0',NULL,NULL,'',NULL,'\0','139c1488-d000-4061-922b-0c0b518a57db','openid-connect',0,'\0','\0','${client_realm-management}','\0','client-secret',NULL,NULL,NULL,'','\0','\0','\0'),
 ('6fcc4ef0-a82c-453e-90ba-0753d2c11c58','','\0','master-realm',0,'\0',NULL,NULL,'',NULL,'\0','61c254e2-095d-42b9-b8cc-4546b124e548',NULL,0,'\0','\0','master Realm','\0','client-secret',NULL,NULL,NULL,'','\0','\0','\0'),
@@ -449,6 +451,10 @@ LOCK TABLES `CLIENT_ATTRIBUTES` WRITE;
 INSERT INTO `CLIENT_ATTRIBUTES` VALUES
 ('2f7d86a0-e8ba-4b75-9009-2048c5611177','pkce.code.challenge.method','S256'),
 ('2f7d86a0-e8ba-4b75-9009-2048c5611177','post.logout.redirect.uris','+'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','backchannel.logout.revoke.offline.tokens','false'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','backchannel.logout.session.required','true'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','oauth2.device.authorization.grant.enabled','false'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','oidc.ciba.grant.enabled','false'),
 ('53ef6db9-271e-46c5-bd72-2f12ea045014','backchannel.logout.revoke.offline.tokens','false'),
 ('53ef6db9-271e-46c5-bd72-2f12ea045014','backchannel.logout.session.required','true'),
 ('53ef6db9-271e-46c5-bd72-2f12ea045014','client.secret.creation.time','1702649298'),
@@ -714,6 +720,17 @@ INSERT INTO `CLIENT_SCOPE_CLIENT` VALUES
 ('2f7d86a0-e8ba-4b75-9009-2048c5611177','d0262425-28ca-4dba-8f8d-12d1146cd725','\0'),
 ('2f7d86a0-e8ba-4b75-9009-2048c5611177','e0711367-7927-43ef-9419-42e57c1d7dd4',''),
 ('2f7d86a0-e8ba-4b75-9009-2048c5611177','ede179a5-d38e-4943-98f9-627b3b05848d',''),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','0c885a01-891a-481f-9087-f6567af22b13','\0'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','434407ef-1d7f-45e8-b91c-7db10210760a','\0'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','4e882685-31e1-451b-9006-cd4ff0dcf750',''),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','5019c5be-c7bd-47b0-a5b3-403a98162efe','\0'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','596a6555-3ee8-4aa9-8168-b8f0de92dbb1','\0'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','5e32d7b8-50b7-4a49-90d4-8c1e467a427c',''),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','781fbb54-8552-44a0-9ea2-fab43dcf0b24','\0'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','78975493-67a3-4819-a933-47b99c7c7e60','\0'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','ccb9d5ba-bf89-4762-81c1-c9c87da7d1e8','\0'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','d6da6000-2013-417d-ad33-33f0804b5b80','\0'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','e58db343-7593-4ffb-8791-bf88b0675191',''),
 ('53ef6db9-271e-46c5-bd72-2f12ea045014','0c885a01-891a-481f-9087-f6567af22b13',''),
 ('53ef6db9-271e-46c5-bd72-2f12ea045014','434407ef-1d7f-45e8-b91c-7db10210760a','\0'),
 ('53ef6db9-271e-46c5-bd72-2f12ea045014','4e882685-31e1-451b-9006-cd4ff0dcf750',''),
@@ -2246,6 +2263,7 @@ LOCK TABLES `POLICY_CONFIG` WRITE;
 /*!40000 ALTER TABLE `POLICY_CONFIG` DISABLE KEYS */;
 INSERT INTO `POLICY_CONFIG` VALUES
 ('71dd1617-3f3b-41d1-8ea7-a2a9f48e5d12','defaultResourceType','urn:rucio:resources:default'),
+('a53eb10e-0623-4586-a482-7a41666a4c68','clients','[\"53ef6db9-271e-46c5-bd72-2f12ea045014\"]'),
 ('cd2e5ea5-10ef-4aed-8871-a8d31296c40b','code','// by default, grants any permission associated with this policy\n$evaluation.grant();\n');
 /*!40000 ALTER TABLE `POLICY_CONFIG` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -3121,6 +3139,7 @@ LOCK TABLES `REDIRECT_URIS` WRITE;
 /*!40000 ALTER TABLE `REDIRECT_URIS` DISABLE KEYS */;
 INSERT INTO `REDIRECT_URIS` VALUES
 ('2f7d86a0-e8ba-4b75-9009-2048c5611177','/realms/master/account/*'),
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','/*'),
 ('53ef6db9-271e-46c5-bd72-2f12ea045014','/*'),
 ('79748e7e-06c2-4915-988c-0e30b15d12db','/admin/master/console/*'),
 ('8b2528fe-d14e-4b36-8b3d-4a44b89bd6dc','/admin/ruciodev/console/*'),
@@ -3254,6 +3273,14 @@ CREATE TABLE `RESOURCE_POLICY` (
 
 LOCK TABLES `RESOURCE_POLICY` WRITE;
 /*!40000 ALTER TABLE `RESOURCE_POLICY` DISABLE KEYS */;
+INSERT INTO `RESOURCE_POLICY` VALUES
+('46e3249c-7cf7-4090-82f6-2a0099718f18','11c1ddb8-56c6-4047-952a-23c46c1c6659'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','127d7c94-3e76-43f0-976c-2977e2071647'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','db08dfbb-34de-410a-a313-6b50fa0abcdb'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','e6709021-619f-4d3c-9946-6f9e6a04d516'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','ecc9bc08-bedc-4379-9aa1-0e933dfeb635'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','ef70cf4a-cf36-4fcf-90e0-6a73eef7cf8a'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','f597076a-7d9e-4456-92c6-1189f4866149');
 /*!40000 ALTER TABLE `RESOURCE_POLICY` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3280,6 +3307,14 @@ CREATE TABLE `RESOURCE_SCOPE` (
 
 LOCK TABLES `RESOURCE_SCOPE` WRITE;
 /*!40000 ALTER TABLE `RESOURCE_SCOPE` DISABLE KEYS */;
+INSERT INTO `RESOURCE_SCOPE` VALUES
+('46e3249c-7cf7-4090-82f6-2a0099718f18','29ce15a4-9a72-4c86-ba7f-4020fdae2219'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','4c4f527f-c073-4ac5-a714-a0a3f1b8d7c9'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','5130fdf6-0d92-44b9-9369-3fcd1b5d5f0b'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','5449d5a5-fff3-4af4-925b-03a43f55a85f'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','6cd9dd9e-0de9-47ca-a0d9-1db4166bc3c7'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','9dd2004a-889e-44e5-840f-1dbd77b61c5d'),
+('46e3249c-7cf7-4090-82f6-2a0099718f18','f32e21c2-c59f-420f-97a4-57f7b74e75f1');
 /*!40000 ALTER TABLE `RESOURCE_SCOPE` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3306,7 +3341,8 @@ CREATE TABLE `RESOURCE_SERVER` (
 LOCK TABLES `RESOURCE_SERVER` WRITE;
 /*!40000 ALTER TABLE `RESOURCE_SERVER` DISABLE KEYS */;
 INSERT INTO `RESOURCE_SERVER` VALUES
-('53ef6db9-271e-46c5-bd72-2f12ea045014','',0,1);
+('53ef6db9-271e-46c5-bd72-2f12ea045014','',0,1),
+('6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6','\0',0,1);
 /*!40000 ALTER TABLE `RESOURCE_SERVER` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3379,8 +3415,16 @@ CREATE TABLE `RESOURCE_SERVER_POLICY` (
 LOCK TABLES `RESOURCE_SERVER_POLICY` WRITE;
 /*!40000 ALTER TABLE `RESOURCE_SERVER_POLICY` DISABLE KEYS */;
 INSERT INTO `RESOURCE_SERVER_POLICY` VALUES
+('11c1ddb8-56c6-4047-952a-23c46c1c6659','map-roles-client-scope.permission.client.34bb26a0-d197-48a9-a0e2-4987dec23d0e',NULL,'scope',1,0,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('127d7c94-3e76-43f0-976c-2977e2071647','configure.permission.client.34bb26a0-d197-48a9-a0e2-4987dec23d0e',NULL,'scope',1,0,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
 ('71dd1617-3f3b-41d1-8ea7-a2a9f48e5d12','Default Permission','A permission that applies to the default resource type','resource',1,0,'53ef6db9-271e-46c5-bd72-2f12ea045014',NULL),
-('cd2e5ea5-10ef-4aed-8871-a8d31296c40b','Default Policy','A policy that grants access only for users within this realm','js',0,0,'53ef6db9-271e-46c5-bd72-2f12ea045014',NULL);
+('a53eb10e-0623-4586-a482-7a41666a4c68','allow-rucio','','client',1,0,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('cd2e5ea5-10ef-4aed-8871-a8d31296c40b','Default Policy','A policy that grants access only for users within this realm','js',0,0,'53ef6db9-271e-46c5-bd72-2f12ea045014',NULL),
+('db08dfbb-34de-410a-a313-6b50fa0abcdb','view.permission.client.34bb26a0-d197-48a9-a0e2-4987dec23d0e',NULL,'scope',1,0,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('e6709021-619f-4d3c-9946-6f9e6a04d516','map-roles-composite.permission.client.34bb26a0-d197-48a9-a0e2-4987dec23d0e',NULL,'scope',1,0,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('ecc9bc08-bedc-4379-9aa1-0e933dfeb635','map-roles.permission.client.34bb26a0-d197-48a9-a0e2-4987dec23d0e',NULL,'scope',1,0,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('ef70cf4a-cf36-4fcf-90e0-6a73eef7cf8a','token-exchange.permission.client.34bb26a0-d197-48a9-a0e2-4987dec23d0e','','scope',1,0,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('f597076a-7d9e-4456-92c6-1189f4866149','manage.permission.client.34bb26a0-d197-48a9-a0e2-4987dec23d0e',NULL,'scope',1,0,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL);
 /*!40000 ALTER TABLE `RESOURCE_SERVER_POLICY` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3414,6 +3458,7 @@ CREATE TABLE `RESOURCE_SERVER_RESOURCE` (
 LOCK TABLES `RESOURCE_SERVER_RESOURCE` WRITE;
 /*!40000 ALTER TABLE `RESOURCE_SERVER_RESOURCE` DISABLE KEYS */;
 INSERT INTO `RESOURCE_SERVER_RESOURCE` VALUES
+('46e3249c-7cf7-4090-82f6-2a0099718f18','client.resource.34bb26a0-d197-48a9-a0e2-4987dec23d0e','Client',NULL,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6','6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6','\0',NULL),
 ('7ecd04d3-2bb5-483c-85c2-b8a377e38f32','Default Resource','urn:rucio:resources:default',NULL,'53ef6db9-271e-46c5-bd72-2f12ea045014','53ef6db9-271e-46c5-bd72-2f12ea045014','\0',NULL);
 /*!40000 ALTER TABLE `RESOURCE_SERVER_RESOURCE` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -3444,6 +3489,14 @@ CREATE TABLE `RESOURCE_SERVER_SCOPE` (
 
 LOCK TABLES `RESOURCE_SERVER_SCOPE` WRITE;
 /*!40000 ALTER TABLE `RESOURCE_SERVER_SCOPE` DISABLE KEYS */;
+INSERT INTO `RESOURCE_SERVER_SCOPE` VALUES
+('29ce15a4-9a72-4c86-ba7f-4020fdae2219','token-exchange',NULL,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('4c4f527f-c073-4ac5-a714-a0a3f1b8d7c9','map-roles-composite',NULL,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('5130fdf6-0d92-44b9-9369-3fcd1b5d5f0b','view',NULL,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('5449d5a5-fff3-4af4-925b-03a43f55a85f','map-roles',NULL,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('6cd9dd9e-0de9-47ca-a0d9-1db4166bc3c7','manage',NULL,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('9dd2004a-889e-44e5-840f-1dbd77b61c5d','configure',NULL,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL),
+('f32e21c2-c59f-420f-97a4-57f7b74e75f1','map-roles-client-scope',NULL,'6f1f1e92-a5e0-48e5-bdf2-4948cc03b8e6',NULL);
 /*!40000 ALTER TABLE `RESOURCE_SERVER_SCOPE` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3553,6 +3606,14 @@ CREATE TABLE `SCOPE_POLICY` (
 
 LOCK TABLES `SCOPE_POLICY` WRITE;
 /*!40000 ALTER TABLE `SCOPE_POLICY` DISABLE KEYS */;
+INSERT INTO `SCOPE_POLICY` VALUES
+('29ce15a4-9a72-4c86-ba7f-4020fdae2219','ef70cf4a-cf36-4fcf-90e0-6a73eef7cf8a'),
+('4c4f527f-c073-4ac5-a714-a0a3f1b8d7c9','e6709021-619f-4d3c-9946-6f9e6a04d516'),
+('5130fdf6-0d92-44b9-9369-3fcd1b5d5f0b','db08dfbb-34de-410a-a313-6b50fa0abcdb'),
+('5449d5a5-fff3-4af4-925b-03a43f55a85f','ecc9bc08-bedc-4379-9aa1-0e933dfeb635'),
+('6cd9dd9e-0de9-47ca-a0d9-1db4166bc3c7','f597076a-7d9e-4456-92c6-1189f4866149'),
+('9dd2004a-889e-44e5-840f-1dbd77b61c5d','127d7c94-3e76-43f0-976c-2977e2071647'),
+('f32e21c2-c59f-420f-97a4-57f7b74e75f1','11c1ddb8-56c6-4047-952a-23c46c1c6659');
 /*!40000 ALTER TABLE `SCOPE_POLICY` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -3997,6 +4058,7 @@ CREATE TABLE `WEB_ORIGINS` (
 LOCK TABLES `WEB_ORIGINS` WRITE;
 /*!40000 ALTER TABLE `WEB_ORIGINS` DISABLE KEYS */;
 INSERT INTO `WEB_ORIGINS` VALUES
+('34bb26a0-d197-48a9-a0e2-4987dec23d0e','/*'),
 ('53ef6db9-271e-46c5-bd72-2f12ea045014','/*'),
 ('79748e7e-06c2-4915-988c-0e30b15d12db','+'),
 ('8b2528fe-d14e-4b36-8b3d-4a44b89bd6dc','+');
@@ -4012,4 +4074,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-15 15:10:08
+-- Dump completed on 2023-12-15 18:30:29
