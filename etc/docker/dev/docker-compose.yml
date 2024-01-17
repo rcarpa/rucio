@@ -156,6 +156,8 @@ services:
       - XRDHOST=xrd1
       - XRDPORT=1094
     volumes:
+      - ./xrd/entrypoint.sh:/docker-entrypoint.sh:ro
+      - ./xrd:/configs:ro
       - ../../certs/rucio_ca.pem:/etc/grid-security/certificates/5fca1cb1.0:z
       - ../../certs/hostcert_xrd1.pem:/tmp/xrdcert.pem:Z
       - ../../certs/hostcert_xrd1.key.pem:/tmp/xrdkey.pem:Z
@@ -171,6 +173,8 @@ services:
       - XRDHOST=xrd2
       - XRDPORT=1095
     volumes:
+      - ./xrd/entrypoint.sh:/docker-entrypoint.sh:ro
+      - ./xrd:/configs:ro
       - ../../certs/rucio_ca.pem:/etc/grid-security/certificates/5fca1cb1.0:z
       - ../../certs/hostcert_xrd2.pem:/tmp/xrdcert.pem:Z
       - ../../certs/hostcert_xrd2.key.pem:/tmp/xrdkey.pem:Z
@@ -186,6 +190,8 @@ services:
       - XRDHOST=xrd3
       - XRDPORT=1096
     volumes:
+      - ./xrd/entrypoint.sh:/docker-entrypoint.sh:ro
+      - ./xrd:/configs:ro
       - ../../certs/rucio_ca.pem:/etc/grid-security/certificates/5fca1cb1.0:z
       - ../../certs/hostcert_xrd3.pem:/tmp/xrdcert.pem:Z
       - ../../certs/hostcert_xrd3.key.pem:/tmp/xrdkey.pem:Z
@@ -201,6 +207,8 @@ services:
       - XRDHOST=xrd4
       - XRDPORT=1097
     volumes:
+      - ./xrd/entrypoint.sh:/docker-entrypoint.sh:ro
+      - ./xrd:/configs:ro
       - ../../certs/rucio_ca.pem:/etc/grid-security/certificates/5fca1cb1.0:z
       - ../../certs/hostcert_xrd4.pem:/tmp/xrdcert.pem:Z
       - ../../certs/hostcert_xrd4.key.pem:/tmp/xrdkey.pem:Z
